@@ -1,0 +1,15 @@
+:root
+{
+    --color-dark: #444477;
+    --color-dark-alt: #8888AA;
+    --color-light: #fcfcfd;
+    --color-light-alt: #e2e2ed;
+
+    --size-padding: 4rem;
+}
+
+html
+{
+    // color: white;
+    background-color: var(--color-light);
+}

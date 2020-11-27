@@ -1,0 +1,26 @@
+---
+layout: layouts/base.njk
+---
+{% set css %}
+    {% include "scss/links.scss" %}
+{% endset %}
+
+<style>
+{{ css | scss | cssmin | safe }}
+</style>
+
+<h1>{{title}}</h1>
+
+{{ content | safe }}
+
+{% for item in links %}
+<ul class="link-group">
+    {% for link in collections[item] %}
+        <li><a class="item" href="{{link.url}}">
+            <span class="title">
+                {{link.data.title}}
+            </span>
+        </a></li>
+    {% endfor %}
+    </ul>
+{% endfor %}

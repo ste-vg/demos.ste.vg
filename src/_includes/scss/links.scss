@@ -1,0 +1,105 @@
+:root
+{
+    --size-padding: 2rem;
+    --size-padding-half: calc(var(--size-padding) * 0.75);
+
+    --layout-grid: 1fr;
+
+    @media only screen and (min-width: 600px) {
+        --size-padding: 4rem;
+        --size-padding-half: calc(var(--size-padding) * 0.5);
+        --layout-grid: 1fr 1fr;
+    }
+}
+
+html, p, a, h1, h2, h3, h4, h5, h6
+{
+    color: var(--color-dark);
+}
+
+body
+{
+    padding: var(--size-padding);
+}
+
+h1
+{
+    font-size: 3rem;
+    padding: 0;
+    margin: 0 0 var(--size-padding) 0;
+}
+
+.link-group
+{
+    max-width: 800px;
+    // width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    display: grid;
+    grid-template-columns: var(--layout-grid);
+    gap: var(--size-padding-half);
+    // border-top: solid 1px var(--color-dark-alt);
+
+    li
+    {
+        // width: 100%;
+
+        a
+        {
+            width: calc(100% - (var(--size-padding-half) * 2) - 2px);
+            display: inline-block;
+            padding: var(--size-padding-half);
+            // border-bottom: solid 1px var(--color-dark-alt);
+            position: relative;
+            font-size: 1.4rem;
+            text-decoration: none;
+            border-radius: 1rem;
+            // background-color: var(--color-light-alt);
+            border: 1px solid var(--color-light-alt);
+            transition-property: transform, box-shadow, background-color, border;
+            transition-duration: 0.3s;
+            transition-timing-function: ease-in-out;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:hover
+            {
+                background-color: white;
+                // color: var(--color-light);
+                border: 1px solid white;
+                box-shadow:
+                    0 2.8px 2.2px rgba(0, 0, 0, 0.02),
+                    0 6.7px 5.3px rgba(0, 0, 0, 0.028),
+                    0 12.5px 10px rgba(0, 0, 0, 0.035),
+                    0 22.3px 17.9px rgba(0, 0, 0, 0.042),
+                    0 41.8px 33.4px rgba(0, 0, 0, 0.05),
+                    0 100px 80px rgba(0, 0, 0, 0.07)
+                    ;
+                transform: translateX(-5px) translateY(-10px);
+                
+            }
+            
+            &:active
+            {
+                background-color: white;
+                transition-duration: 0.3s;
+                border: 1px solid white;
+                box-shadow:
+                    0 0.6px 1.7px rgba(0, 0, 0, 0.008),
+                    0 1.3px 4.1px rgba(97, 77, 77, 0.012),
+                    0 2.5px 7.6px rgba(0, 0, 0, 0.015),
+                    0 4.5px 13.6px rgba(0, 0, 0, 0.018),
+                    0 8.4px 25.5px rgba(0, 0, 0, 0.022),
+                    0 20px 61px rgba(0, 0, 0, 0.03)
+                    ;
+
+
+                transform: translateX(-2px) translateY(-4px);
+                
+            }
+        }
+    }
+}

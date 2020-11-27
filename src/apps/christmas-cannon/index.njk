@@ -1,0 +1,24 @@
+---
+title: Christmas Cannon
+layout: layouts/base.njk
+permalink: '/christmas-cannon/'
+tags: demos
+---
+
+{% set css %}
+    {% include "./index.scss" %}
+{% endset %}
+
+<style>
+{{ css | scss | cssmin | safe }}
+</style>
+
+<div id="canvas-container"></div>
+
+{% set js %}
+    {% include "compiled/christmas-cannon.js" %}
+{% endset %}
+
+<script>
+{{ js | safe }}
+</script>

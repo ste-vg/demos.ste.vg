@@ -1,0 +1,49 @@
+{
+  "name": "epm-prototypes",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack --mode development  && npm run serve",
+    "clean": "rimraf _site",
+    "serve:webpack": "webpack --mode development --watch",
+    "serve:eleventy": "ELEVENTY_ENV=development eleventy --serve",
+    "serve": "npm-run-all clean --parallel serve:*",
+    "build:webpack": "webpack --mode production",
+    "build:eleventy": "ELEVENTY_ENV=production eleventy",
+    "build": "run-s clean build:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ste-vg/portfolio.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ste-vg/portfolio/issues"
+  },
+  "homepage": "https://github.com/ste-vg/portfolio#readme",
+  "dependencies": {
+    "@11ty/eleventy": "^0.11.1",
+    "@types/cannon": "^0.1.5",
+    "@types/three": "^0.103.2",
+    "autoprefixer": "^10.0.1",
+    "cannon": "^0.6.2",
+    "clean-css": "^4.2.3",
+    "css-loader": "^5.0.0",
+    "eleventy": "^1.0.6",
+    "gsap": "^3.5.1",
+    "node-sass": "^5.0.0",
+    "terser": "^5.3.8",
+    "three": "^0.122.0",
+    "three-to-cannon": "^3.0.2"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^8.0.7",
+    "typescript": "^4.0.5",
+    "webpack": "^5.3.2",
+    "webpack-cli": "^4.1.0"
+  }
+}
