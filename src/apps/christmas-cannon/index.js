@@ -21,7 +21,7 @@ function init()
 		height: 30
 	}
 
-	let stage = new Stage(worldScale, stageSize);
+	let stage = new Stage(worldScale, stageSize, onReady);
 	let physics = new Physics(worldScale, stageSize);
 	
 	let editablePhysics = {};
@@ -129,13 +129,18 @@ function init()
 		if(settings.name) editablePhysics[settings.name] = item;
 	})
 
-	createTree();
+	
 	
 	// let test = createStaticBox(stageSize.left + 25, -10, (stageSize.width / 2), 2, Math.PI * 0.05);
 
 	// gsap.to(test.physics.position, {delay: 1, x: stageSize.left + 15, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateVelocity(test)});
 	// gsap.to(test, {delay: 1, rotationVelocity: -0.01, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateRotation(test)});
 
+	function onReady()
+	{
+		// createTree();
+		animate();
+	}
 
 	function setDirection(direction)
 	{
@@ -177,7 +182,7 @@ function init()
 	{		
 		// gsap.to(stage.cameraTarget, {x: stageSize.left + (stageSize.width * 0.5), ease: 'Power4.inOut', duration: 1})
 
-		doPhysics = true;
+		
 		
 		var size = 1;
 		let x = 20;
@@ -228,12 +233,19 @@ function init()
 
 		return physicsItem
 	}
+
+	function fire()
+	{
+		count++;
+		if(count === 1) createTree();
+		else addBall();
+ 	}
 	
 	function createTree()
 	{
-		let x = 0;
-		let y = -13;
-		let z = 0;
+		let x = 30;
+		let y = -10;
+		let z = 30;
 		let tr = 1;
 		let br = 8;
 		let h = 19;
@@ -246,14 +258,28 @@ function init()
 			rotation: 0,
 			rotationVelocity: 0
 		}
+		const angularRandomness = 10;
+		physicsItem.physics.angularVelocity.set(
+			((Math.random() * angularRandomness) - (angularRandomness/2)),
+			-10 + ((Math.random() * angularRandomness) - (angularRandomness/2)),
+			((Math.random() * angularRandomness) - (angularRandomness/2))
+		)
+		physicsItem.physics.angularDamping = 0.8;
+		physicsItem.physics.velocity.set(
+			-30 - (Math.random() * 30), 
+			20 + (Math.random() * 10), 
+			-30 - (Math.random() * 30)
+		)
 		physicsItems.push(physicsItem);
+
+		doPhysics = true;
 	}
 
 	function onDocumentKeyPress( event )
 	{
 		event.preventDefault();
 
-		if(stage) addBall()
+		if(stage) fire()
 	}
 	
 	function animate() 
@@ -275,7 +301,7 @@ function init()
 		requestAnimationFrame( animate );
 	}
 
-	animate();
+	
 	// addBall();
 }
 
