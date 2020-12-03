@@ -1,6 +1,7 @@
 import { Stage } from "./stage";
 import { Physics } from "./physics";
 import * as CANNON from "cannon";
+import { Group } from "three";
 
 const DIRECTION = {
 	left: 'LEFT',
@@ -89,11 +90,23 @@ function init()
 			color: 0xccccff,
 			rotation: 0
 		},
-		{
+		
+	]
+
+	staticItems.forEach(settings => {
+		let item = createStaticBox(settings);
+		if(settings.name) editablePhysics[settings.name] = item;
+	})
+
+	function createSofa()
+	{
+		let body = physics.createBody(10, {x: 7, y: 0, z: 3}, {y: Math.PI * 1.01, x: Math.PI * 0.005});
+
+		let shapes = [{
 			show: false,
-			x: stageSize.left + 29,
-			y: -26,
-			z: 2.1,
+			x: 0,
+			y: -1.5,
+			z: 0,
 			width: 9,
 			height: 3.5,
 			depth: 23,
@@ -102,34 +115,55 @@ function init()
 		},
 		{
 			show: false,
-			x: stageSize.left + 33.3,
-			y: -25,
-			z: 2.1,
-			width: 6,
-			height: 2,
+			x: -4,
+			y: 1,
+			z: 0,
+			width: 2.5,
+			height: 6,
 			depth: 23,
 			color: 0xccccff,
-			rotation: Math.PI * 0.5
+			rotation: 0
 		},
 		{
 			show: false,
-			x: stageSize.left + 31,
-			y: -23,
-			z: 2.1,
-			width: 6,
-			height: 1,
+			x: -1.8,
+			y: 2.8,
+			z: 0,
+			width: 3,
+			height: 2,
 			depth: 18,
 			color: 0xccccff,
-			rotation: Math.PI * 0.3
+			rotation: -Math.PI * 0.4
+		}];
+
+		let sofaGuideGroup = new Group();
+		sofaGuideGroup.add(stage.sofaGroup)
+		stage.scene.add(sofaGuideGroup);
+
+		shapes.forEach(box => {
+			let shape = physics.createBoxShape(box.width, box.height, box.depth);
+			// let b = stage.createBox(box.width, box.height, box.depth);
+			// b.position.set(box.x, box.y, box.z);
+			// b.rotation.set(0, 0, box.rotation);
+			// sofaGuideGroup.add(b);
+			body.addShape(shape, new CANNON.Vec3(box.x, box.y, box.z), new CANNON.Quaternion(0, 0, box.rotation));
+		})
+
+		var physicsItem = { 
+			mesh: stage.sofaGroup,
+			physics: body,
 		}
-	]
-
-	staticItems.forEach(settings => {
-		let item = createStaticBox(settings);
-		if(settings.name) editablePhysics[settings.name] = item;
-	})
-
-	
+		
+		// physicsItem.physics.velocity.set(-20 - (Math.random() * 50), 1 + (Math.random() * 10), -20 - (Math.random() * 50))
+		// const angularRandomness = 10;
+		// physicsItem.physics.angularVelocity.set(
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+		// physicsItem.physics.angularDamping = 0.8;
+		
+		physicsItems.push(physicsItem);
+	}
 	
 	// let test = createStaticBox(stageSize.left + 25, -10, (stageSize.width / 2), 2, Math.PI * 0.05);
 
@@ -139,6 +173,10 @@ function init()
 	function onReady()
 	{
 		// createTree();
+		createSofa();
+
+		doPhysics = true;
+
 		animate();
 	}
 
@@ -272,7 +310,7 @@ function init()
 		)
 		physicsItems.push(physicsItem);
 
-		doPhysics = true;
+		
 	}
 
 	function onDocumentKeyPress( event )

@@ -37,6 +37,32 @@ class Physics
     	this.world.defaultContactMaterial.frictionEquationRelaxation = 1;    
         
 	}
+
+	createBody(mass, position, rotation)
+	{
+		let body = new CANNON.Body({
+            type: mass == 0 ? CANNON.Body.KINEMATIC : CANNON.Body.DYNAMIC,
+            material: this.mainMaterial,
+            mass: mass * this.scale,
+            position: new CANNON.Vec3(position.x * this.scale, position.y * this.scale, position.z * this.scale), // m
+		});
+
+		Object.keys(rotation || {}).forEach(key => 
+		{
+			console.log('key', key)
+			this.setAngle(body, rotation[key], key);
+		})
+		this.world.addBody(body);
+
+		return body;
+	}
+
+	createBoxShape(width, height, depth)
+	{
+		let box = new CANNON.Box(new CANNON.Vec3(width / 2 * this.scale, height / 2 * this.scale, depth / 2 * this.scale));
+
+		return box;
+	}
 	
 	createBox(width, height, depth, x, y, z, mass = 0, rotation = 0, trigger)
 	{

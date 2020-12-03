@@ -5,7 +5,8 @@ import {
     PlaneBufferGeometry, WebGLRenderer, 
     PerspectiveCamera, Vector3,
     Group, BoxGeometry, IcosahedronGeometry,
-    CylinderGeometry, Cache, PCFSoftShadowMap, LoadingManager
+	CylinderGeometry, Cache, PCFSoftShadowMap, 
+	LoadingManager, AxisHelper
 } from "three";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -67,6 +68,7 @@ class Stage
 		this.scene = new Scene();
 		this.scene.background = new Color( 0x424874 );
 		this.scene.fog = new Fog(0x424874, 100, 200);
+		this.scene.add(new AxisHelper());
 		
 		// LIGHTS
 		
@@ -130,11 +132,14 @@ class Stage
 		
 		// ROOM
 		
+		this.sofaGroup = new Group();
+		this.scene.add(this.sofaGroup);
+
 		var gltfLoader = new GLTFLoader(manager);
-		gltfLoader.load("https://assets.codepen.io/557388/model.gltf", object => {
-			object.scene.position.set(-5, -3.2, 15);
-			object.scene.scale.set(15, 15, 15);
-		  	object.scene.rotation.y = -Math.PI * 0.5;
+		gltfLoader.load("/models/sofa.gltf", object => {
+			// object.scene.position.set(-5, -3.2, 15);
+			// object.scene.scale.set(15, 15, 15);
+		  	// object.scene.rotation.y = -Math.PI * 0.5;
 			
 			
 // 			object.scene.( function ( child ) {
@@ -146,7 +151,7 @@ class Stage
 			
 			let mat = new MeshPhongMaterial  ( { color: 0xddbbaa } );
 			
-			this.scene.add( object.scene );
+			this.sofaGroup.add( object.scene );
 			// console.log(object)
 			// object.scene.castShadows = true;
 			
