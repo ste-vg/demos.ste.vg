@@ -1,18 +1,29 @@
 import * as CANNON from "cannon";
 
+const PHYSICS_MATERIAL = {
+	lowBounce: 'lowbounce',
+	normalBounce: 'normalbounce',
+	highBounce: 'highbounce',
+}
+
 class Physics
 {
 	constructor(scale = 1, stageSize)
 	{
 		this.scale = 1;
 		this.stageSize;
-		this.mainMaterial;
 		
         this.scale = scale;
-        this.stageSize = stageSize;
+		this.stageSize = stageSize;
+		
+		this.materials = {};
 
-        this.mainMaterial = new CANNON.Material('main');
-        this.mainMaterial.friction = 1;
+        let mainMaterial = new CANNON.Material('main');
+		mainMaterial.friction = 1;
+		
+		this.materials[PHYSICS_MATERIAL.lowBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 0.1 });
+		this.materials[PHYSICS_MATERIAL.normalBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 0.5 });
+		this.materials[PHYSICS_MATERIAL.highBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 1.5 });
 
 		// WORLD
 
@@ -21,9 +32,13 @@ class Physics
 		this.world.broadphase = new CANNON.NaiveBroadphase();
 		this.world.solver.iterations = 4;
 
+		this.world.addContactMaterial(this.materials[PHYSICS_MATERIAL.lowBounce]); 
+		this.world.addContactMaterial(this.materials[PHYSICS_MATERIAL.normalBounce]); 
+		this.world.addContactMaterial(this.materials[PHYSICS_MATERIAL.highBounce]); 
+
 		// GROUND
 		
-		this.groundBody = new CANNON.Body({mass: 0, material: this.mainMaterial});
+		this.groundBody = new CANNON.Body({mass: 0, material: mainMaterial});
 		let groundShape = new CANNON.Plane();
 		this.groundBody.addShape(groundShape);
 		var rotate = new CANNON.Vec3(1,0,0)
@@ -31,18 +46,15 @@ class Physics
         this.groundBody.position.set(0, (this.stageSize.top - this.stageSize.height) * scale, 0)
 		this.world.addBody(this.groundBody);
 
-		this.world.defaultContactMaterial.contactEquationStiffness = 1e8;
-		this.world.defaultContactMaterial.contactEquationRelaxation = 1;
-		this.world.defaultContactMaterial.frictionEquationStiffness = 1e20;
-    	this.world.defaultContactMaterial.frictionEquationRelaxation = 1;    
+	   
         
 	}
 
-	createBody(mass, position, rotation)
+	createBody(mass, position, rotation, material = PHYSICS_MATERIAL.normalBounce)
 	{
 		let body = new CANNON.Body({
             type: mass == 0 ? CANNON.Body.KINEMATIC : CANNON.Body.DYNAMIC,
-            material: this.mainMaterial,
+            material: this.materials[material],
             mass: mass * this.scale,
             position: new CANNON.Vec3(position.x * this.scale, position.y * this.scale, position.z * this.scale), // m
 		});
@@ -69,7 +81,7 @@ class Physics
 		let shape = new CANNON.Box(new CANNON.Vec3(width / 2 * this.scale, height / 2 * this.scale, depth / 2 * this.scale));
 		let body = new CANNON.Body({
             type: mass == 0 ? CANNON.Body.KINEMATIC : CANNON.Body.DYNAMIC,
-            material: this.mainMaterial,
+            material: this.materials[PHYSICS_MATERIAL.normalBounce],
             mass: mass * this.scale,
             position: new CANNON.Vec3(x * this.scale, y * this.scale, z * this.scale), // m
 		});
@@ -102,7 +114,7 @@ class Physics
 	{
 		let shape = new CANNON.Sphere(size);
 		let body = new CANNON.Body({
-            material: this.mainMaterial,
+            material: this.materials[PHYSICS_MATERIAL.highBounce],
 			mass: 1 * this.scale,
 			position: new CANNON.Vec3(x * this.scale, y * this.scale, z * this.scale), // m
 		});
@@ -118,7 +130,7 @@ class Physics
 		let shape = new CANNON.Cylinder(radiusTop, radiusBottom,  height, numSegments);
             
 		let body = new CANNON.Body({
-			material: this.mainMaterial,
+			material: this.materials[PHYSICS_MATERIAL.normalBounce],
 			mass: 15 * this.scale,
 			position: new CANNON.Vec3(x * this.scale, y * this.scale, z * this.scale), // m
 		});
@@ -141,4 +153,4 @@ class Physics
 	}
 }
 
-export { Physics }
+export { Physics, PHYSICS_MATERIAL }

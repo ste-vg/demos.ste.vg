@@ -1,5 +1,5 @@
 import { Stage } from "./stage";
-import { Physics } from "./physics";
+import { Physics, PHYSICS_MATERIAL } from "./physics";
 import * as CANNON from "cannon";
 import { Group } from "three";
 
@@ -12,6 +12,8 @@ function init()
 {
 	console.clear();
 	console.log('init()');
+
+	let showGuides = false;
 
 	let worldScale = 1;
 
@@ -65,7 +67,7 @@ function init()
 			width: 25,
 			height: 2,
 			depth: 40,
-			color: 0xaeaeff,
+			color: 0xcccccc,
 			rotation: Math.PI * 0.5,
 		},
 		{
@@ -76,7 +78,7 @@ function init()
 			width: 41,
 			height: 25,
 			depth: 2,
-			color: 0xbbbbff,
+			color: 0xcccccc,
 			rotation: 0
 		},
 		{
@@ -87,9 +89,53 @@ function init()
 			width: 40,
 			height: 2,
 			depth: 40,
-			color: 0xccccff,
+			color: 0xcccccc,
 			rotation: 0
 		},
+		{
+			show: showGuides,
+			x: 5.5,
+			y: -25,
+			z: -18,
+			width: 3,
+			height: 14,
+			depth: 3,
+			color: 0xff0000,
+			rotation: 0
+		},
+		{
+			show: showGuides,
+			x: -5,
+			y: -25,
+			z: -18,
+			width: 3,
+			height: 14,
+			depth: 3,
+			color: 0xff0000,
+			rotation: 0
+		},
+		{
+			show: showGuides,
+			x: 0,
+			y: -19,
+			z: -18,
+			width: 10,
+			height: 2.5,
+			depth: 3,
+			color: 0xff0000,
+			rotation: 0
+		},
+		{
+			show: showGuides,
+			x: 0,
+			y: -17.7,
+			z: -18,
+			width: 15.2,
+			height: 0.5,
+			depth: 3.3,
+			color: 0xff0000,
+			rotation: 0
+		}
 		
 	]
 
@@ -100,7 +146,7 @@ function init()
 
 	function createSofa()
 	{
-		let body = physics.createBody(10, {x: 7, y: 0, z: 3}, {y: Math.PI * 1.01, x: Math.PI * 0.005});
+		let body = physics.createBody(10, {x: 12, y: -10, z: 2}, {y: Math.PI * 1.023, x: Math.PI * 0.01}, PHYSICS_MATERIAL.lowBounce);
 
 		let shapes = [{
 			show: false,
@@ -108,53 +154,161 @@ function init()
 			y: -1.5,
 			z: 0,
 			width: 9,
-			height: 3.5,
-			depth: 23,
-			color: 0xccccff,
+			height: 2.6,
+			depth: 23.5,
 			rotation: 0
 		},
 		{
 			show: false,
 			x: -4,
-			y: 1,
+			y: 0,
 			z: 0,
-			width: 2.5,
+			width: 2.3,
 			height: 6,
 			depth: 23,
-			color: 0xccccff,
 			rotation: 0
 		},
 		{
 			show: false,
-			x: -1.8,
+			x: 0,
+			y: 0,
+			z: -10.3,
+			width: 9,
+			height: 2,
+			depth: 2.5,
+			rotation: 0
+		},
+		{
+			show: false,
+			x: 0,
+			y: 0,
+			z: 10.3,
+			width: 9,
+			height: 2,
+			depth: 2.5,
+			rotation: 0
+		},
+		{
+			show: false,
+			x: -2.2,
 			y: 2.8,
 			z: 0,
-			width: 3,
-			height: 2,
-			depth: 18,
-			color: 0xccccff,
+			width: 3.5,
+			height: 1,
+			depth: 18.5,
 			rotation: -Math.PI * 0.4
 		}];
 
-		let sofaGuideGroup = new Group();
-		sofaGuideGroup.add(stage.sofaGroup)
-		stage.scene.add(sofaGuideGroup);
+		let sofaGroup = new Group();
+		sofaGroup.add(stage.models.sofa)
+		stage.scene.add(sofaGroup);
 
 		shapes.forEach(box => {
 			let shape = physics.createBoxShape(box.width, box.height, box.depth);
-			// let b = stage.createBox(box.width, box.height, box.depth);
-			// b.position.set(box.x, box.y, box.z);
-			// b.rotation.set(0, 0, box.rotation);
-			// sofaGuideGroup.add(b);
+			
+			if(showGuides)
+			{
+				let b = stage.createBox(box.width, box.height, box.depth, 0xff0000);
+				b.position.set(box.x, box.y, box.z);
+				b.rotation.set(0, 0, box.rotation);
+				sofaGroup.add(b);
+			}
+
 			body.addShape(shape, new CANNON.Vec3(box.x, box.y, box.z), new CANNON.Quaternion(0, 0, box.rotation));
 		})
 
 		var physicsItem = { 
-			mesh: stage.sofaGroup,
+			mesh: sofaGroup,
 			physics: body,
 		}
 		
-		// physicsItem.physics.velocity.set(-20 - (Math.random() * 50), 1 + (Math.random() * 10), -20 - (Math.random() * 50))
+		physicsItem.physics.velocity.set(0, -20, 0)
+		// const angularRandomness = 10;
+		// physicsItem.physics.angularVelocity.set(
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+		// physicsItem.physics.angularDamping = 0.8;
+		
+		physicsItems.push(physicsItem);
+	}
+
+	function createTable()
+	{
+		let body = physics.createBody(6, {x: 0, y: -13, z: 2}, {y: -Math.PI * 1.013, x: Math.PI * 0.01}, PHYSICS_MATERIAL.lowBounce);
+
+		let shapes = [
+			{
+				x: 0.5,
+				y: -1.2,
+				z: 0,
+				width: 7,
+				height: 0.5,
+				depth: 16,
+				rotation: 0
+			},
+			{
+				x: 4,
+				y: -2.5,
+				z: 7.8,
+				width: 0.5,
+				height: 2.5,
+				depth: 0.5,
+				rotation: 0
+			},
+			{
+				x: 4,
+				y: -2.5,
+				z: -7.8,
+				width: 0.5,
+				height: 2.5,
+				depth: 0.5,
+				rotation: 0
+			},
+			{
+				x: -2.8,
+				y: -2.5,
+				z: 7.8,
+				width: 0.5,
+				height: 2.5,
+				depth: 0.5,
+				rotation: 0
+			},
+			{
+				x: -2.8,
+				y: -2.5,
+				z: -7.8,
+				width: 0.5,
+				height: 2.5,
+				depth: 0.5,
+				rotation: 0
+			},
+		];
+
+		let tableGroup = new Group();
+		tableGroup.add(stage.models.table)
+		stage.scene.add(tableGroup);
+
+		shapes.forEach(box => {
+			let shape = physics.createBoxShape(box.width, box.height, box.depth);
+			
+			if(showGuides)
+			{
+				let b = stage.createBox(box.width, box.height, box.depth, 0xff0000);
+				b.position.set(box.x, box.y, box.z);
+				b.rotation.set(0, 0, box.rotation);
+				tableGroup.add(b);
+			}
+
+			body.addShape(shape, new CANNON.Vec3(box.x, box.y, box.z), new CANNON.Quaternion(0, 0, box.rotation));
+		})
+
+		var physicsItem = { 
+			mesh: tableGroup,
+			physics: body,
+		}
+		
+		physicsItem.physics.velocity.set(0, -20, 0)
 		// const angularRandomness = 10;
 		// physicsItem.physics.angularVelocity.set(
 		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
@@ -174,6 +328,7 @@ function init()
 	{
 		// createTree();
 		createSofa();
+		createTable();
 
 		doPhysics = true;
 
@@ -222,7 +377,7 @@ function init()
 
 		
 		
-		var size = 1;
+		var size = .5;
 		let x = 20;
 		let y = -10;
 		let z = 20;
@@ -275,7 +430,7 @@ function init()
 	function fire()
 	{
 		count++;
-		if(count === 1) createTree();
+		if(count === 6) createTree();
 		else addBall();
  	}
 	
@@ -290,7 +445,7 @@ function init()
 		let seg = 10;
 		
 		var physicsItem = { 
-			mesh: stage.treeGroup,
+			mesh: stage.models.tree,
 			physics: physics.createCylinder(x, y, z, tr, br, h, seg),
 			previousPosition: new CANNON.Vec3(x, y, z),
 			rotation: 0,

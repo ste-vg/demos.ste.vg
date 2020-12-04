@@ -17,6 +17,8 @@ class Stage
 	{
 		const manager = new LoadingManager();
 
+		this.models = {}
+
 		manager.onLoad = function ( ) {
 
 			console.log( 'Loading complete!');
@@ -68,7 +70,7 @@ class Stage
 		this.scene = new Scene();
 		this.scene.background = new Color( 0x424874 );
 		this.scene.fog = new Fog(0x424874, 100, 200);
-		this.scene.add(new AxisHelper());
+		// this.scene.add(new AxisHelper());
 		
 		// LIGHTS
 		
@@ -132,29 +134,16 @@ class Stage
 		
 		// ROOM
 		
-		this.sofaGroup = new Group();
-		this.scene.add(this.sofaGroup);
+		let sofaGroup = new Group();
+		this.scene.add(sofaGroup);
 
-		var gltfLoader = new GLTFLoader(manager);
-		gltfLoader.load("/models/sofa.gltf", object => {
-			// object.scene.position.set(-5, -3.2, 15);
-			// object.scene.scale.set(15, 15, 15);
-		  	// object.scene.rotation.y = -Math.PI * 0.5;
+		var sofaLoader = new GLTFLoader(manager);
+		sofaLoader.load("/models/sofa.gltf", object => {
+
+			let mat = new MeshPhongMaterial  ( { color: 0xffffff } );
 			
-			
-// 			object.scene.( function ( child ) {
-// 				let mat = new MeshPhongMaterial ( { color: 0xdddddd } );
-// 				child.material = mat;
-				
-// 				// console.log(child);
-// 			});
-			
-			let mat = new MeshPhongMaterial  ( { color: 0xddbbaa } );
-			
-			this.sofaGroup.add( object.scene );
-			// console.log(object)
-			// object.scene.castShadows = true;
-			
+			sofaGroup.add( object.scene );
+
 			object.scene.traverse( function( child ) { 
 
 				if ( child.isMesh ) {
@@ -169,36 +158,27 @@ class Stage
 				}
 
 			} );
-			
-// 			object.scene.children.forEach((d, i) => {
-// 				// console.log(d);
-// 				d.castShadows = true;
-				
-// 				// gsap.from(d.position, {y: 8, ease: 'bounce', duration: 1.4, delay: 0.2 * i})
-// 			})
+
+			this.models.sofa = sofaGroup;
 		});
-		this.treeGroup = new Group();
-		this.scene.add( this.treeGroup );
+
+		let treeGroup = new Group();
+		this.scene.add( treeGroup );
 		
-		var gltfLoader = new GLTFLoader(manager);
-		gltfLoader.load("https://assets.codepen.io/557388/PineTree.gltf", object => {
+		var treeLoader = new GLTFLoader(manager);
+		treeLoader.load("https://assets.codepen.io/557388/PineTree.gltf", object => {
+
 			object.scene.position.set(0, 0, -18);
 			object.scene.scale.set(1.4, 1.4, 1.4);
 			object.scene.rotation.x = Math.PI * 0.5;
-		  	this.treeGroup.add( object.scene );
-		  	
-			this.treeGroup.position.y = 100;
-			// object.scene.castShadows = true;
-			
-			// object.scene.children.forEach((d, i) => {
-			// 	gsap.from(d.position, {y: 8, ease: 'bounce', duration: 1.4, delay: 0.2 * i})
-			// })
+			  
+			treeGroup.add( object.scene );
+			treeGroup.position.y = 100;
 			
 			object.scene.traverse( function( child ) { 
 
 				let mat = new MeshPhongMaterial  ( { color: 0x99dd66 } );
 				if ( child.isMesh ) {
-					// child.position.set(0, 0, 0);
 					child.castShadow = true;
 					child.receiveShadow = true;
 					child.material = mat;
@@ -209,6 +189,70 @@ class Stage
 				}
 
 			} );
+
+			this.models.tree = treeGroup;
+		});
+
+		let fireplaceGroup = new Group();
+		this.scene.add( fireplaceGroup );
+		
+		var fireplaceLoader = new GLTFLoader(manager);
+		fireplaceLoader.load("/models/fireplace.gltf", object => {
+
+			object.scene.position.set(0, -29, -19.5);
+			object.scene.scale.set(4, 4, 4);
+			object.scene.rotation.y = -Math.PI * 0.5;
+		  	fireplaceGroup.add( object.scene );
+		  	
+			// this.fireplaceGroup.position.y = 100;
+			
+			object.scene.traverse( function( child ) { 
+
+				let mat = new MeshPhongMaterial  ( { color: 0xffffff } );
+				if ( child.isMesh ) {
+					child.castShadow = true;
+					child.receiveShadow = true;
+					child.material = mat;
+				}
+				else if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.fireplace = fireplaceGroup;
+		});
+
+		let tableGroup = new Group();
+		this.scene.add( tableGroup );
+		
+		var tableLoader = new GLTFLoader(manager);
+		tableLoader.load("/models/table.gltf", object => {
+
+			object.scene.position.set(0, -6.3, 0);
+			object.scene.scale.set(2, 2, 2);
+			// object.scene.rotation.y = -Math.PI * 0.5;
+		  	tableGroup.add( object.scene );
+		  	
+			// this.tableGroup.position.y = 100;
+			
+			object.scene.traverse( function( child ) { 
+
+				let mat = new MeshPhongMaterial  ( { color: 0xffffff } );
+				if ( child.isMesh ) {
+					child.castShadow = true;
+					child.receiveShadow = true;
+					child.material = mat;
+				}
+				else if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.table = tableGroup;
 		});
 
 		this.onResize();
@@ -289,11 +333,11 @@ class Stage
 		let mesh = new Mesh( geometry, material );
 		mesh.castShadow = true;
 		group.add(mesh);
-		if(light)
-		{
-			let light = new PointLight(color, .5, 100, 10 );
-			group.add(light);	
-		}
+		// if(light)
+		// {
+		// 	let light = new PointLight(color, .5, 100, 10 );
+		// 	group.add(light);	
+		// }
 		this.scene.add(group);
 		return group;
 	}
