@@ -76,14 +76,14 @@ class Stage
 		
 		this.scene.add( new HemisphereLight(0xfefeff, 0xeeeeff, 0.4 ));
 		
-		const ambientLight = new PointLight( 0xDDEEBB, 0.1);
+		const ambientLight = new PointLight( 0xffffff, 0.1);
 		ambientLight.position.set(30, -10, 30)
 		this.scene.add( ambientLight );
 		
-		const shadowLight = new PointLight( 0xFFF1EB, 0.6, 100 );
+		const shadowLight = new PointLight( 0xffffff, 0.6, 100 );
 		shadowLight.position.set( 10, 0, 4 );
 		shadowLight.castShadow = true;
-		shadowLight.shadow.radius = 32;
+		shadowLight.shadow.radius = 16;
 		shadowLight.shadow.mapSize.width = 1024; 
 		shadowLight.shadow.mapSize.height = 1024;
 		this.scene.add( shadowLight );
@@ -133,6 +133,11 @@ class Stage
         // this.scene.add( stageSizeHelper );
 		
 		// ROOM
+
+
+		///=================
+		//    SOFA
+		///=================
 		
 		let sofaGroup = new Group();
 		this.scene.add(sofaGroup);
@@ -161,6 +166,10 @@ class Stage
 
 			this.models.sofa = sofaGroup;
 		});
+
+		///=================
+		//    TREE
+		///=================
 
 		let treeGroup = new Group();
 		this.scene.add( treeGroup );
@@ -193,6 +202,10 @@ class Stage
 			this.models.tree = treeGroup;
 		});
 
+		///=================
+		//    FIREPLACE
+		///=================
+
 		let fireplaceGroup = new Group();
 		this.scene.add( fireplaceGroup );
 		
@@ -224,6 +237,10 @@ class Stage
 			this.models.fireplace = fireplaceGroup;
 		});
 
+		///=================
+		//    TABLE
+		///=================
+
 		let tableGroup = new Group();
 		this.scene.add( tableGroup );
 		
@@ -254,6 +271,78 @@ class Stage
 
 			this.models.table = tableGroup;
 		});
+
+		///=================
+		//    TV STAND
+		///=================
+
+		let standGroup = new Group();
+		this.scene.add( standGroup );
+		
+		var tableLoader = new GLTFLoader(manager);
+		tableLoader.load("/models/stand.gltf", object => {
+
+			// object.scene.position.set(0, -6.3, 0);
+			// object.scene.scale.set(2, 2, 2);
+			object.scene.rotation.y = Math.PI * 0.5;
+		  	standGroup.add( object.scene );
+		  	
+			// this.standGroup.position.y = 100;
+			
+			object.scene.traverse( function( child ) { 
+
+				let mat = new MeshPhongMaterial  ( { color: 0xffffff } );
+				if ( child.isMesh ) {
+					child.castShadow = true;
+					child.receiveShadow = true;
+					child.material = mat;
+				}
+				else if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.stand = standGroup;
+		});
+		
+		///=================
+		//    TV
+		///=================
+
+		let tvGroup = new Group();
+		this.scene.add( tvGroup );
+		
+		var tableLoader = new GLTFLoader(manager);
+		tableLoader.load("/models/tv.gltf", object => {
+
+			// object.scene.position.set(0, -6.3, 0);
+			object.scene.scale.set(2, 2, 2);
+			object.scene.rotation.y = Math.PI * 0.5;
+		  	tvGroup.add( object.scene );
+		  	
+			// this.tvGroup.position.y = 100;
+			
+			object.scene.traverse( function( child ) { 
+
+				let mat = new MeshPhongMaterial  ( { color: 0xffffff } );
+				if ( child.isMesh ) {
+					child.castShadow = true;
+					child.receiveShadow = true;
+					child.material = mat;
+				}
+				else if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.tv = tvGroup;
+		});
+
+		
 
 		this.onResize();
 	}
@@ -333,11 +422,11 @@ class Stage
 		let mesh = new Mesh( geometry, material );
 		mesh.castShadow = true;
 		group.add(mesh);
-		// if(light)
-		// {
-		// 	let light = new PointLight(color, .5, 100, 10 );
-		// 	group.add(light);	
-		// }
+		if(light)
+		{
+			let light = new PointLight(color, .5, 100, 10 );
+			group.add(light);	
+		}
 		this.scene.add(group);
 		return group;
 	}

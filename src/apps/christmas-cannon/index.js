@@ -13,7 +13,7 @@ function init()
 	console.clear();
 	console.log('init()');
 
-	let showGuides = false;
+	let showGuides = true;
 
 	let worldScale = 1;
 
@@ -319,6 +319,117 @@ function init()
 		physicsItems.push(physicsItem);
 	}
 	
+	function createStand()
+	{
+		let body = physics.createBody(6, {x: -16, y: -10, z: 0}, {y: -Math.PI * 0.001, x: Math.PI * 0.05}, PHYSICS_MATERIAL.lowBounce);
+
+		let shapes = [
+			{
+				x: 0,
+				y: 1.5,
+				z: 0,
+				width: 4.5,
+				height: 4.8,
+				depth: 18,
+				rotation: 0
+			}
+			
+		];
+
+		let standGroup = new Group();
+		standGroup.add(stage.models.stand)
+		stage.scene.add(standGroup);
+
+		shapes.forEach(box => {
+			let shape = physics.createBoxShape(box.width, box.height, box.depth);
+			
+			if(showGuides)
+			{
+				let b = stage.createBox(box.width, box.height, box.depth, 0xff0000);
+				b.position.set(box.x, box.y, box.z);
+				b.rotation.set(0, 0, box.rotation);
+				standGroup.add(b);
+			}
+
+			body.addShape(shape, new CANNON.Vec3(box.x, box.y, box.z), new CANNON.Quaternion(0, 0, box.rotation));
+		})
+
+		var physicsItem = { 
+			mesh: standGroup,
+			physics: body,
+		}
+		
+		physicsItem.physics.velocity.set(0, -20, 0)
+		// const angularRandomness = 10;
+		// physicsItem.physics.angularVelocity.set(
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+		// physicsItem.physics.angularDamping = 0.8;
+		
+		physicsItems.push(physicsItem);
+	}
+	
+	function createTV()
+	{
+		let body = physics.createBody(2, {x: -15.5, y: 0, z: 0}, {y: -Math.PI * 0.001, x: Math.PI * 0.001}, PHYSICS_MATERIAL.lowBounce);
+
+		let shapes = [
+			{
+				x: 0,
+				y: 4.5,
+				z: 0.5,
+				width: 1.5,
+				height: 9.5,
+				depth: 18,
+				rotation: 0
+			},
+			{
+				x: 0,
+				y: -1.6,
+				z: 0.5,
+				width: 2.5,
+				height: 0.5,
+				depth: 6.8,
+				rotation: 0
+			}
+			
+		];
+
+		let tvGroup = new Group();
+		tvGroup.add(stage.models.tv)
+		stage.scene.add(tvGroup);
+
+		shapes.forEach(box => {
+			let shape = physics.createBoxShape(box.width, box.height, box.depth);
+			
+			if(showGuides)
+			{
+				let b = stage.createBox(box.width, box.height, box.depth, 0xff0000);
+				b.position.set(box.x, box.y, box.z);
+				b.rotation.set(0, 0, box.rotation);
+				tvGroup.add(b);
+			}
+
+			body.addShape(shape, new CANNON.Vec3(box.x, box.y, box.z), new CANNON.Quaternion(0, 0, box.rotation));
+		})
+
+		var physicsItem = { 
+			mesh: tvGroup,
+			physics: body,
+		}
+		
+		physicsItem.physics.velocity.set(0, -20, 0)
+		// const angularRandomness = 10;
+		// physicsItem.physics.angularVelocity.set(
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+		// physicsItem.physics.angularDamping = 0.8;
+		
+		physicsItems.push(physicsItem);
+	}
+	
 	// let test = createStaticBox(stageSize.left + 25, -10, (stageSize.width / 2), 2, Math.PI * 0.05);
 
 	// gsap.to(test.physics.position, {delay: 1, x: stageSize.left + 15, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateVelocity(test)});
@@ -329,6 +440,8 @@ function init()
 		// createTree();
 		createSofa();
 		createTable();
+		createStand();
+		createTV();
 
 		doPhysics = true;
 
