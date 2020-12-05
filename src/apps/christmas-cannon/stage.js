@@ -16,6 +16,7 @@ class Stage
 	constructor(scale, stageSize, onReady)
 	{
 		const manager = new LoadingManager();
+		
 
 		this.models = {}
 
@@ -455,11 +456,11 @@ class Stage
 		let mesh = new Mesh( geometry, material );
 		mesh.castShadow = true;
 		group.add(mesh);
-		if(light)
-		{
-			let light = new PointLight(color, .5, 100, 10 );
-			group.add(light);	
-		}
+		// if(light)
+		// {
+		// 	let light = new PointLight(color, .5, 100, 10 );
+		// 	group.add(light);	
+		// }
 		this.scene.add(group);
 		return group;
 	}

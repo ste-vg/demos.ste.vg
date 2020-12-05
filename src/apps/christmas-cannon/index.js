@@ -15,6 +15,8 @@ function init()
 
 	let showGuides = false;
 
+	let prepItems = {};
+
 	let worldScale = 1;
 
 	let stageSize = {
@@ -433,7 +435,7 @@ function init()
 	function createTree()
 	{
 		let body = physics.createBody(10, {x: 30, y: -10, z: 30}, {y: -Math.PI * 0.001, x: Math.PI * 0.001}, PHYSICS_MATERIAL.lowBounce);
-
+		physics.setAngle(body, -Math.PI * 0.5, 'x');
 		let shapes = [
 			{
 				x: 0,
@@ -464,10 +466,8 @@ function init()
 			}
 		];
 
-		let treeGroup = new Group();
-		treeGroup.add(stage.models.tree)
-		treeGroup.add(stage.models.pot)
-		stage.scene.add(treeGroup);
+		
+		stage.scene.add(prepItems.tree);
 
 		shapes.forEach(cylinder => {
 			let shape = physics.createCylinderShape(cylinder.topRadius, cylinder.bottomRadius, cylinder.height, cylinder.segments);
@@ -484,7 +484,7 @@ function init()
 		})
 
 		var physicsItem = { 
-			mesh: treeGroup,
+			mesh: prepItems.tree,
 			physics: body,
 		}
 		
@@ -504,9 +504,21 @@ function init()
 	// gsap.to(test.physics.position, {delay: 1, x: stageSize.left + 15, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateVelocity(test)});
 	// gsap.to(test, {delay: 1, rotationVelocity: -0.01, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateRotation(test)});
 
+	function prepTree()
+	{
+		let treeGroup = new Group();
+		treeGroup.add(stage.models.tree);
+		treeGroup.add(stage.models.pot);
+
+		prepItems.tree = treeGroup;
+	}
+
 	function onReady()
 	{
 		// createTree();
+
+		prepTree();
+
 		createSofa();
 		createTable();
 		createStand();
