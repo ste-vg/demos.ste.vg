@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import { 
     TextureLoader, RepeatWrapping, 
     Scene, Color, Fog, HemisphereLight, 
@@ -18,7 +19,8 @@ class Stage
 		const manager = new LoadingManager();
 		
 
-		this.models = {}
+		this.models = {};
+		
 
 		manager.onLoad = function ( ) {
 
@@ -135,6 +137,30 @@ class Stage
 		
 		// ROOM
 
+		this.lights = [];
+
+		let colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff,  0x00ffff];
+
+		for (let i = 0; i < 20; i++) {
+
+			let group = new Group();
+			group.position.x = 1000;
+
+			let color = colors[Math.floor(Math.random() * colors.length)];
+			let light = new PointLight(color, .5, 50, 5 );
+			gsap.to(light, {intensity: 0, delay: Math.random(), duration: 0.5, yoyo: true, repeat: -1})
+			group.add(light);
+			
+			let geometry = new IcosahedronGeometry(0.5, 4);
+			let material = new MeshPhongMaterial ( { color: color, wireframe: false } );
+			let mesh = new Mesh( geometry, material );
+			mesh.castShadow = true;
+			group.add(mesh);
+			
+			this.scene.add(group);
+			this.lights.push(group);
+		}
+
 
 		///=================
 		//    SOFA
@@ -179,7 +205,7 @@ class Stage
 		treeLoader.load("https://assets.codepen.io/557388/PineTree.gltf", object => {
 
 			object.scene.position.set(0, 0, -17);
-			object.scene.scale.set(1.4, 1.4, 1.4);
+			object.scene.scale.set(1.2, 1.2, 1.2);
 			object.scene.rotation.x = Math.PI * 0.5;
 			  
 			treeGroup.add( object.scene );
@@ -354,7 +380,7 @@ class Stage
 		tableLoader.load("/models/pot.gltf", object => {
 
 			object.scene.position.set(0, 0, -15);
-			object.scene.scale.set(7, 7, 7);
+			object.scene.scale.set(6, 6, 6);
 			object.scene.rotation.x = Math.PI * 0.5;
 		  	potGroup.add( object.scene );
 		  	
@@ -450,17 +476,19 @@ class Stage
 
 	createBall(size, color, light = false)
 	{
+		
+		if(light && this.lights.length)
+		{
+			return this.lights.shift();
+		}
+		
 		let group = new Group();
 		let geometry = new IcosahedronGeometry(size, 4);
 		let material = new MeshPhongMaterial ( { color: color, wireframe: false } );
 		let mesh = new Mesh( geometry, material );
 		mesh.castShadow = true;
 		group.add(mesh);
-		// if(light)
-		// {
-		// 	let light = new PointLight(color, .5, 100, 10 );
-		// 	group.add(light);	
-		// }
+
 		this.scene.add(group);
 		return group;
 	}

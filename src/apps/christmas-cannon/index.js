@@ -43,6 +43,7 @@ function init()
 
 	window.addEventListener( 'resize', () => { stage.onResize() }, false );
 	document.addEventListener( 'keypress', onDocumentKeyPress, false );
+	document.addEventListener( 'click', onDocumentKeyPress, false );
 
 	let letters = [];
 	let count = 0;
@@ -440,17 +441,17 @@ function init()
 			{
 				x: 0,
 				y: 0,
-				z: 0,
+				z: -2.2,
 				topRadius: 1,
-				bottomRadius: 8,
-				height: 19,
+				bottomRadius: 6,
+				height: 16,
 				segments: 10
 			},
 			{
 				x: 0,
 				y: 0,
 				z: -13,
-				topRadius: 1,
+				topRadius: 0.5,
 				bottomRadius: 1,
 				height: 7,
 				segments: 5
@@ -459,15 +460,17 @@ function init()
 				x: 0,
 				y: 0,
 				z: -15,
-				topRadius: 3.5,
-				bottomRadius: 2.5,
+				topRadius: 3,
+				bottomRadius: 2,
 				height: 5,
 				segments: 7
 			}
 		];
 
-		
-		stage.scene.add(prepItems.tree);
+		let treeGroup = new Group();
+		treeGroup.add(stage.models.tree);
+		treeGroup.add(stage.models.pot);
+		stage.scene.add(treeGroup);
 
 		shapes.forEach(cylinder => {
 			let shape = physics.createCylinderShape(cylinder.topRadius, cylinder.bottomRadius, cylinder.height, cylinder.segments);
@@ -484,12 +487,12 @@ function init()
 		})
 
 		var physicsItem = { 
-			mesh: prepItems.tree,
+			mesh: treeGroup,
 			physics: body,
 		}
 		
-		body.velocity.set(-60, 20, -60)
-		const angularRandomness = 10;
+		body.velocity.set(-40, 30, -40)
+		const angularRandomness = 5;
 		body.angularVelocity.set(
 			((Math.random() * angularRandomness) - (angularRandomness/2)),
 			((Math.random() * angularRandomness) - (angularRandomness/2)),
@@ -506,11 +509,9 @@ function init()
 
 	function prepTree()
 	{
-		let treeGroup = new Group();
-		treeGroup.add(stage.models.tree);
-		treeGroup.add(stage.models.pot);
+		
 
-		prepItems.tree = treeGroup;
+		// prepItems.tree = treeGroup;
 	}
 
 	function onReady()
@@ -624,7 +625,7 @@ function init()
 	function fire()
 	{
 		count++;
-		if(count === 1) createTree();
+		if(count === 10) createTree();
 		else addBall();
  	}
 	
