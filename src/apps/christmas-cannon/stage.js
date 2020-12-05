@@ -177,12 +177,12 @@ class Stage
 		var treeLoader = new GLTFLoader(manager);
 		treeLoader.load("https://assets.codepen.io/557388/PineTree.gltf", object => {
 
-			object.scene.position.set(0, 0, -18);
+			object.scene.position.set(0, 0, -17);
 			object.scene.scale.set(1.4, 1.4, 1.4);
 			object.scene.rotation.x = Math.PI * 0.5;
 			  
 			treeGroup.add( object.scene );
-			treeGroup.position.y = 100;
+			// treeGroup.position.y = 100;
 			
 			object.scene.traverse( function( child ) { 
 
@@ -342,7 +342,40 @@ class Stage
 			this.models.tv = tvGroup;
 		});
 
+		///=================
+		//    POT
+		///=================
+
+		let potGroup = new Group();
+		this.scene.add( potGroup );
 		
+		var tableLoader = new GLTFLoader(manager);
+		tableLoader.load("/models/pot.gltf", object => {
+
+			object.scene.position.set(0, 0, -15);
+			object.scene.scale.set(7, 7, 7);
+			object.scene.rotation.x = Math.PI * 0.5;
+		  	potGroup.add( object.scene );
+		  	
+			// this.potGroup.position.y = 100;
+			
+			object.scene.traverse( function( child ) { 
+
+				let mat = new MeshPhongMaterial  ( { color: 0xB2967D } );
+				if ( child.isMesh ) {
+					child.castShadow = true;
+					child.receiveShadow = true;
+					child.material = mat;
+				}
+				else if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.pot = potGroup;
+		});
 
 		this.onResize();
 	}

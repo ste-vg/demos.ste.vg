@@ -13,7 +13,7 @@ function init()
 	console.clear();
 	console.log('init()');
 
-	let showGuides = true;
+	let showGuides = false;
 
 	let worldScale = 1;
 
@@ -430,6 +430,75 @@ function init()
 		physicsItems.push(physicsItem);
 	}
 	
+	function createTree()
+	{
+		let body = physics.createBody(10, {x: 30, y: -10, z: 30}, {y: -Math.PI * 0.001, x: Math.PI * 0.001}, PHYSICS_MATERIAL.lowBounce);
+
+		let shapes = [
+			{
+				x: 0,
+				y: 0,
+				z: 0,
+				topRadius: 1,
+				bottomRadius: 8,
+				height: 19,
+				segments: 10
+			},
+			{
+				x: 0,
+				y: 0,
+				z: -13,
+				topRadius: 1,
+				bottomRadius: 1,
+				height: 7,
+				segments: 5
+			},
+			{
+				x: 0,
+				y: 0,
+				z: -15,
+				topRadius: 3.5,
+				bottomRadius: 2.5,
+				height: 5,
+				segments: 7
+			}
+		];
+
+		let treeGroup = new Group();
+		treeGroup.add(stage.models.tree)
+		treeGroup.add(stage.models.pot)
+		stage.scene.add(treeGroup);
+
+		shapes.forEach(cylinder => {
+			let shape = physics.createCylinderShape(cylinder.topRadius, cylinder.bottomRadius, cylinder.height, cylinder.segments);
+			
+			if(showGuides)
+			{
+				let b = stage.createCylinder(cylinder.topRadius, cylinder.bottomRadius, cylinder.height, cylinder.segments, 0xff0000);
+				b.position.set(cylinder.x, cylinder.y, cylinder.z);
+				b.rotation.set(0,0,0);
+				treeGroup.add(b);
+			}
+
+			body.addShape(shape, new CANNON.Vec3(cylinder.x, cylinder.y, cylinder.z), new CANNON.Quaternion(0, 0, cylinder.rotation));
+		})
+
+		var physicsItem = { 
+			mesh: treeGroup,
+			physics: body,
+		}
+		
+		body.velocity.set(-60, 20, -60)
+		const angularRandomness = 10;
+		body.angularVelocity.set(
+			((Math.random() * angularRandomness) - (angularRandomness/2)),
+			((Math.random() * angularRandomness) - (angularRandomness/2)),
+			((Math.random() * angularRandomness) - (angularRandomness/2)))
+		body.angularDamping = 0.8;
+		
+		physicsItems.push(physicsItem);
+	}
+	
 	// let test = createStaticBox(stageSize.left + 25, -10, (stageSize.width / 2), 2, Math.PI * 0.05);
 
 	// gsap.to(test.physics.position, {delay: 1, x: stageSize.left + 15, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateVelocity(test)});
@@ -543,43 +612,43 @@ function init()
 	function fire()
 	{
 		count++;
-		if(count === 6) createTree();
+		if(count === 1) createTree();
 		else addBall();
  	}
 	
-	function createTree()
-	{
-		let x = 30;
-		let y = -10;
-		let z = 30;
-		let tr = 1;
-		let br = 8;
-		let h = 19;
-		let seg = 10;
+	// function createTree()
+	// {
+	// 	let x = 30;
+	// 	let y = -10;
+	// 	let z = 30;
+	// 	let tr = 1;
+	// 	let br = 8;
+	// 	let h = 19;
+	// 	let seg = 10;
 		
-		var physicsItem = { 
-			mesh: stage.models.tree,
-			physics: physics.createCylinder(x, y, z, tr, br, h, seg),
-			previousPosition: new CANNON.Vec3(x, y, z),
-			rotation: 0,
-			rotationVelocity: 0
-		}
-		const angularRandomness = 10;
-		physicsItem.physics.angularVelocity.set(
-			((Math.random() * angularRandomness) - (angularRandomness/2)),
-			-10 + ((Math.random() * angularRandomness) - (angularRandomness/2)),
-			((Math.random() * angularRandomness) - (angularRandomness/2))
-		)
-		physicsItem.physics.angularDamping = 0.8;
-		physicsItem.physics.velocity.set(
-			-30 - (Math.random() * 30), 
-			20 + (Math.random() * 10), 
-			-30 - (Math.random() * 30)
-		)
-		physicsItems.push(physicsItem);
+	// 	var physicsItem = { 
+	// 		mesh: stage.models.tree,
+	// 		physics: physics.createCylinder(x, y, z, tr, br, h, seg),
+	// 		previousPosition: new CANNON.Vec3(x, y, z),
+	// 		rotation: 0,
+	// 		rotationVelocity: 0
+	// 	}
+	// 	const angularRandomness = 10;
+	// 	physicsItem.physics.angularVelocity.set(
+	// 		((Math.random() * angularRandomness) - (angularRandomness/2)),
+	// 		-10 + ((Math.random() * angularRandomness) - (angularRandomness/2)),
+	// 		((Math.random() * angularRandomness) - (angularRandomness/2))
+	// 	)
+	// 	physicsItem.physics.angularDamping = 0.8;
+	// 	physicsItem.physics.velocity.set(
+	// 		-30 - (Math.random() * 30), 
+	// 		20 + (Math.random() * 10), 
+	// 		-30 - (Math.random() * 30)
+	// 	)
+	// 	physicsItems.push(physicsItem);
 
 		
-	}
+	// }
 
 	function onDocumentKeyPress( event )
 	{

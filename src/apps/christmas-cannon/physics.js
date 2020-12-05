@@ -21,8 +21,8 @@ class Physics
         let mainMaterial = new CANNON.Material('main');
 		mainMaterial.friction = 1;
 		
-		this.materials[PHYSICS_MATERIAL.lowBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 0.1 });
-		this.materials[PHYSICS_MATERIAL.normalBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 0.5 });
+		this.materials[PHYSICS_MATERIAL.lowBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 0 });
+		this.materials[PHYSICS_MATERIAL.normalBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 0 });
 		this.materials[PHYSICS_MATERIAL.highBounce] = new CANNON.ContactMaterial(mainMaterial, mainMaterial, {friction: 2, restitution: 1.5 });
 
 		// WORLD
@@ -46,8 +46,6 @@ class Physics
         this.groundBody.position.set(0, (this.stageSize.top - this.stageSize.height) * scale, 0)
 		this.world.addBody(this.groundBody);
 
-	   
-        
 	}
 
 	createBody(mass, position, rotation, material = PHYSICS_MATERIAL.normalBounce)
@@ -71,10 +69,30 @@ class Physics
 
 	createBoxShape(width, height, depth)
 	{
-		let box = new CANNON.Box(new CANNON.Vec3(width / 2 * this.scale, height / 2 * this.scale, depth / 2 * this.scale));
-
-		return box;
+		return new CANNON.Box(new CANNON.Vec3(width / 2 * this.scale, height / 2 * this.scale, depth / 2 * this.scale));
 	}
+
+	createCylinderShape(radiusTop, radiusBottom,  height, segments)
+	{
+		return new CANNON.Cylinder(radiusTop, radiusBottom,  height, segments);
+	}
+
+	// createCylinder(x, y, z, radiusTop, radiusBottom,  height, numSegments)
+	// {
+	// 	let shape = new CANNON.Cylinder(radiusTop, radiusBottom,  height, numSegments);
+            
+	// 	let body = new CANNON.Body({
+	// 		material: this.materials[PHYSICS_MATERIAL.normalBounce],
+	// 		mass: 15 * this.scale,
+	// 		position: new CANNON.Vec3(x * this.scale, y * this.scale, z * this.scale), // m
+	// 	});
+	// 	body.addShape(shape);
+	// 	this.setAngle(body, -Math.PI * 0.5, 'x');
+
+	// 	this.world.addBody(body);
+
+	// 	return body;
+	// }
 	
 	createBox(width, height, depth, x, y, z, mass = 0, rotation = 0, trigger)
 	{
