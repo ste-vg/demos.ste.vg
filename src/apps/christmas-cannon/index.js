@@ -2,6 +2,7 @@ import { Stage } from "./stage";
 import { Physics, PHYSICS_MATERIAL } from "./physics";
 import * as CANNON from "cannon";
 import { Group } from "three";
+import gsap from "gsap";
 
 const DIRECTION = {
 	left: 'LEFT',
@@ -16,6 +17,7 @@ function init()
 	let showGuides = false;
 
 	let prepItems = {};
+	let cannonFlash;
 
 	let worldScale = 1;
 
@@ -28,6 +30,8 @@ function init()
 
 	let stage = new Stage(worldScale, stageSize, onReady);
 	let physics = new Physics(worldScale, stageSize);
+
+	
 	
 	let editablePhysics = {};
 
@@ -518,6 +522,10 @@ function init()
 	{
 		// createTree();
 
+		cannonFlash = gsap.timeline();
+		cannonFlash.fromTo(stage.cannonLight, {intensity: 6}, {intensity: 0, duration: .3});
+		// cannonFlash.stop();
+
 		prepTree();
 
 		createSofa();
@@ -627,6 +635,8 @@ function init()
 		count++;
 		if(count === 10) createTree();
 		else addBall();
+		cannonFlash.restart();
+		
  	}
 	
 	// function createTree()

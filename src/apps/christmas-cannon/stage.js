@@ -1,4 +1,4 @@
-import gsap from "gsap";
+
 import { 
     TextureLoader, RepeatWrapping, 
     Scene, Color, Fog, HemisphereLight, 
@@ -11,6 +11,7 @@ import {
 } from "three";
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import Stats from "three/examples/jsm/libs/stats.module";
 
 class Stage 
 {
@@ -20,7 +21,7 @@ class Stage
 		
 
 		this.models = {};
-		
+		this.stats = new Stats();
 
 		manager.onLoad = function ( ) {
 
@@ -80,7 +81,7 @@ class Stage
 		this.scene.add( new HemisphereLight(0xfefeff, 0xeeeeff, 0.4 ));
 		
 		const ambientLight = new PointLight( 0xffffff, 0.1);
-		ambientLight.position.set(30, -10, 30)
+		ambientLight.position.set(20, -10, 20)
 		this.scene.add( ambientLight );
 		
 		const shadowLight = new PointLight( 0xffffff, 0.6, 100 );
@@ -90,6 +91,14 @@ class Stage
 		shadowLight.shadow.mapSize.width = 1024; 
 		shadowLight.shadow.mapSize.height = 1024;
 		this.scene.add( shadowLight );
+
+		this.cannonLight = new PointLight( 0xEDB458, 0, 100, 2);
+		this.cannonLight.position.set(40, -20, 40)
+		this.cannonLight.castShadow = true;
+		this.cannonLight.shadow.radius = 2;
+		this.cannonLight.shadow.mapSize.width = 128; 
+		this.cannonLight.shadow.mapSize.height = 128;
+		this.scene.add( this.cannonLight );
 		
 		// FLOOR
 		
@@ -115,6 +124,7 @@ class Stage
 		
 		this.container = document.getElementById( 'canvas-container' );
 		this.container.appendChild( this.renderer.domElement );
+		this.container.appendChild( this.stats.dom );
 
 		// CAMERA
 
@@ -141,14 +151,14 @@ class Stage
 
 		let colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff,  0x00ffff];
 
-		for (let i = 0; i < 20; i++) {
+		for (let i = 0; i < 3; i++) {
 
 			let group = new Group();
 			group.position.x = 1000;
 
 			let color = colors[Math.floor(Math.random() * colors.length)];
-			let light = new PointLight(color, .5, 50, 5 );
-			gsap.to(light, {intensity: 0, delay: Math.random(), duration: 0.5, yoyo: true, repeat: -1})
+			let light = new PointLight(color, 0.5, 50, 1.7 );
+			// gsap.timeline({ repeat: -1}).to(light, {intensity: 0.7, duration: 0.2}).to(light, {intensity: 0.5, duration: 0.2}).to(light, {intensity: 0.8, duration: 0.2})
 			group.add(light);
 			
 			let geometry = new IcosahedronGeometry(0.5, 4);
@@ -202,7 +212,7 @@ class Stage
 		this.scene.add( treeGroup );
 		
 		var treeLoader = new GLTFLoader(manager);
-		treeLoader.load("https://assets.codepen.io/557388/PineTree.gltf", object => {
+		treeLoader.load("/models/PineTree.gltf", object => {
 
 			object.scene.position.set(0, 0, -17);
 			object.scene.scale.set(1.2, 1.2, 1.2);
@@ -276,10 +286,7 @@ class Stage
 
 			object.scene.position.set(0, -6.3, 0);
 			object.scene.scale.set(2, 2, 2);
-			// object.scene.rotation.y = -Math.PI * 0.5;
 		  	tableGroup.add( object.scene );
-		  	
-			// this.tableGroup.position.y = 100;
 			
 			object.scene.traverse( function( child ) { 
 
@@ -309,12 +316,8 @@ class Stage
 		var tableLoader = new GLTFLoader(manager);
 		tableLoader.load("/models/stand.gltf", object => {
 
-			// object.scene.position.set(0, -6.3, 0);
-			// object.scene.scale.set(2, 2, 2);
 			object.scene.rotation.y = Math.PI * 0.5;
 		  	standGroup.add( object.scene );
-		  	
-			// this.standGroup.position.y = 100;
 			
 			object.scene.traverse( function( child ) { 
 
@@ -344,12 +347,9 @@ class Stage
 		var tableLoader = new GLTFLoader(manager);
 		tableLoader.load("/models/tv.gltf", object => {
 
-			// object.scene.position.set(0, -6.3, 0);
 			object.scene.scale.set(2, 2, 2);
 			object.scene.rotation.y = Math.PI * 0.5;
 		  	tvGroup.add( object.scene );
-		  	
-			// this.tvGroup.position.y = 100;
 			
 			object.scene.traverse( function( child ) { 
 
@@ -383,8 +383,6 @@ class Stage
 			object.scene.scale.set(6, 6, 6);
 			object.scene.rotation.x = Math.PI * 0.5;
 		  	potGroup.add( object.scene );
-		  	
-			// this.potGroup.position.y = 100;
 			
 			object.scene.traverse( function( child ) { 
 
@@ -439,6 +437,8 @@ class Stage
 			
 // 		}
 		this.renderer.render( this.scene, this.camera );
+
+		this.stats.update();
 	}
 	
 	onResize() 
