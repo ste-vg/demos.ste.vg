@@ -1,0 +1,125 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.3.48",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "node_MeshObject1270210560-PolyPaper21",
+            "scale" : [
+                16.231731414794922,
+                16.231731414794922,
+                16.231731414794922
+            ],
+            "translation" : [
+                0.015984147787094116,
+                0.9415664076805115,
+                0.014370322227478027
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "emissiveFactor" : [
+                0,
+                0,
+                0
+            ],
+            "name" : "BlocksPaper",
+            "pbrMetallicRoughness" : {
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.6000000238418579
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "mesh_m0-PolyPaper21_-234540",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "COLOR_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 7993,
+            "max" : [
+                0.09004458785057068,
+                0.07643675804138184,
+                0.12616246938705444
+            ],
+            "min" : [
+                -0.09012797474861145,
+                -0.07361280918121338,
+                -0.10743963718414307
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 7993,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 7993,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 8244,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 95916,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 95916,
+            "byteOffset" : 95916
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 127888,
+            "byteOffset" : 191832
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 16488,
+            "byteOffset" : 319720
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 336208,
+            "uri" : "cannon2.bin"
+        }
+    ]
+}

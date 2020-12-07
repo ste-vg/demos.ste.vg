@@ -96,8 +96,8 @@ class Stage
 		this.cannonLight.position.set(40, -20, 40)
 		this.cannonLight.castShadow = true;
 		this.cannonLight.shadow.radius = 2;
-		this.cannonLight.shadow.mapSize.width = 128; 
-		this.cannonLight.shadow.mapSize.height = 128;
+		this.cannonLight.shadow.mapSize.width = 256; 
+		this.cannonLight.shadow.mapSize.height = 256;
 		this.scene.add( this.cannonLight );
 		
 		// FLOOR
@@ -114,7 +114,7 @@ class Stage
 		// RENDERER
 		
 		this.renderer = new WebGLRenderer( { antialias: true } );
-		
+		console.log('pixel ratio:', window.devicePixelRatio)
 		// this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
 		this.renderer.shadowMap.enabled = true;
@@ -129,8 +129,10 @@ class Stage
 		// CAMERA
 
 		this.camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 5, 400  );
-		this.camera.position.set(50, 15, 50);
-		this.cameraTarget = new Vector3( 0, -22, 0 );
+		// this.camera.position.set(55, 15, 55);
+		// this.cameraTarget = new Vector3( 0, -22, 0 );
+		this.camera.position.set(65, -20, 20);
+		this.cameraTarget = new Vector3( 30, -25, 30 );
         
         let center = new Vector3((this.stageSize.left + (this.stageSize.width / 2)) * scale, (this.stageSize.top - (this.stageSize.height / 2)) * scale, 0)
         const previewCameraDistance = 70 * scale;
@@ -401,6 +403,38 @@ class Stage
 
 			this.models.pot = potGroup;
 		});
+
+		///=================
+		//    CANNON
+		///=================
+
+		let cannonGroup = new Group();
+		this.scene.add( cannonGroup );
+		
+		var tableLoader = new GLTFLoader(manager);
+		tableLoader.load("/models/cannon2.gltf", object => {
+
+			object.scene.position.set(30, -30, 30);
+			object.scene.scale.set(3, 3, 3);
+			object.scene.rotation.y = Math.PI * 1.25;
+		  	cannonGroup.add( object.scene );
+			
+			object.scene.traverse( function( child ) { 
+
+				if ( child.isMesh ) {
+					child.castShadow = true;
+				}
+				if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.cannon = cannonGroup;
+		});
+
+
 
 		this.onResize();
 	}

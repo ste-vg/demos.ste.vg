@@ -4,20 +4,64 @@ import * as CANNON from "cannon";
 import { Group } from "three";
 import gsap from "gsap";
 
+console.clear();
+
 const DIRECTION = {
 	left: 'LEFT',
 	right: 'RIGHT'
 }
 
+let stage;
+let physics;
+
+// class ChristmasCannon
+// {
+// 	constructor()
+// 	{
+// 		this.showGuides = false;
+// 		this.cannonFlash;
+// 		this.cannonRecoil;
+// 		this.editablePhysics = {};
+
+// 		this.createWorld();
+// 	}
+
+// 	createWorld()
+// 	{
+// 		let worldScale = 1;
+
+// 		let stageSize = {
+// 			left: -20,
+// 			width: 40,
+// 			top: 0,
+// 			height: 30
+// 		}
+
+// 		stage = new Stage(worldScale, stageSize, onReady);
+// 		physics = new Physics(worldScale, stageSize);
+
+// 		this.stage = new Stage(worldScale, stageSize, onReady);
+// 		this.physics = new Physics(worldScale, stageSize);
+// 	}
+// }
+
+const introSteps = [init];
+
+function next() 
+{
+	introSteps.shift()();
+}
+
 function init()
 {
-	console.clear();
+	
 	console.log('init()');
 
 	let showGuides = false;
 
-	let prepItems = {};
+	// animations
 	let cannonFlash;
+	let cannonRecoil;
 
 	let worldScale = 1;
 
@@ -28,12 +72,10 @@ function init()
 		height: 30
 	}
 
-	let stage = new Stage(worldScale, stageSize, onReady);
-	let physics = new Physics(worldScale, stageSize);
-
+	stage = new Stage(worldScale, stageSize, onReady);
+	physics = new Physics(worldScale, stageSize);
 	
-	
-	let editablePhysics = {};
+	// let editablePhysics = {};
 
 	// const settings = {
 	// 	area: {
@@ -63,7 +105,7 @@ function init()
 	// 	}
 	// })
 
-	
+
 
 	let staticItems = [
 		{
@@ -147,8 +189,8 @@ function init()
 	]
 
 	staticItems.forEach(settings => {
-		let item = createStaticBox(settings);
-		if(settings.name) editablePhysics[settings.name] = item;
+		createStaticBox(settings);
+		// if(settings.name) editablePhysics[settings.name] = item;
 	})
 
 	function createSofa()
@@ -505,28 +547,20 @@ function init()
 		
 		physicsItems.push(physicsItem);
 	}
-	
-	// let test = createStaticBox(stageSize.left + 25, -10, (stageSize.width / 2), 2, Math.PI * 0.05);
-
-	// gsap.to(test.physics.position, {delay: 1, x: stageSize.left + 15, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateVelocity(test)});
-	// gsap.to(test, {delay: 1, rotationVelocity: -0.01, ease: 'power3.inOut', repeat: -1, yoyo: true, duration: 2, onUpdate:() => updateRotation(test)});
-
-	function prepTree()
-	{
-		
-
-		// prepItems.tree = treeGroup;
-	}
 
 	function onReady()
 	{
 		// createTree();
 
+
+
 		cannonFlash = gsap.timeline();
-		cannonFlash.fromTo(stage.cannonLight, {intensity: 6}, {intensity: 0, duration: .3});
+		cannonFlash.fromTo(stage.cannonLight, {intensity: 4}, {intensity: 0, duration: .3});
+
+		cannonRecoil = gsap.timeline();
+		cannonRecoil.to(stage.models.cannon.position, {x: '+=3', z: '+=3', duration: 0.1, ease: 'Power2.out'}).to(stage.models.cannon.position, {x: '-=3', z: '-=3', duration: 0.4})
 		// cannonFlash.stop();
 
-		prepTree();
 
 		createSofa();
 		createTable();
@@ -581,9 +615,9 @@ function init()
 		
 		
 		var size = .5;
-		let x = 20;
-		let y = -10;
-		let z = 20;
+		let x = 35;
+		let y = -15;
+		let z = 35;
 		
 		let width = 1 + Math.random() * 4;
 		let height = 1 + Math.random() * 4;
@@ -601,7 +635,16 @@ function init()
 			rotationVelocity: 0
 		}
 		
-		physicsItem.physics.velocity.set(-20 - (Math.random() * 50), 1 + (Math.random() * 10), -20 - (Math.random() * 50))
+		// physicsItem.physics.velocity.set(-20 - (Math.random() * 50), 1 + (Math.random() * 10), -20 - (Math.random() * 50))
+
+
+		// -60 => -20
+
+		// 10 => 30
+
+		// -20 => -60
+
+		physicsItem.physics.velocity.set(-60, 10, -60)
 		const angularRandomness = 10;
 		physicsItem.physics.angularVelocity.set(
 			((Math.random() * angularRandomness) - (angularRandomness/2)),
@@ -636,43 +679,10 @@ function init()
 		if(count === 10) createTree();
 		else addBall();
 		cannonFlash.restart();
+		cannonRecoil.restart();
 		
  	}
 	
-	// function createTree()
-	// {
-	// 	let x = 30;
-	// 	let y = -10;
-	// 	let z = 30;
-	// 	let tr = 1;
-	// 	let br = 8;
-	// 	let h = 19;
-	// 	let seg = 10;
-		
-	// 	var physicsItem = { 
-	// 		mesh: stage.models.tree,
-	// 		physics: physics.createCylinder(x, y, z, tr, br, h, seg),
-	// 		previousPosition: new CANNON.Vec3(x, y, z),
-	// 		rotation: 0,
-	// 		rotationVelocity: 0
-	// 	}
-	// 	const angularRandomness = 10;
-	// 	physicsItem.physics.angularVelocity.set(
-	// 		((Math.random() * angularRandomness) - (angularRandomness/2)),
-	// 		-10 + ((Math.random() * angularRandomness) - (angularRandomness/2)),
-	// 		((Math.random() * angularRandomness) - (angularRandomness/2))
-	// 	)
-	// 	physicsItem.physics.angularDamping = 0.8;
-	// 	physicsItem.physics.velocity.set(
-	// 		-30 - (Math.random() * 30), 
-	// 		20 + (Math.random() * 10), 
-	// 		-30 - (Math.random() * 30)
-	// 	)
-	// 	physicsItems.push(physicsItem);
-
-		
-	// }
-
 	function onDocumentKeyPress( event )
 	{
 		event.preventDefault();
@@ -703,4 +713,4 @@ function init()
 	// addBall();
 }
 
-init();
+next();

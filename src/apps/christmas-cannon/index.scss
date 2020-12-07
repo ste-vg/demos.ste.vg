@@ -1,4 +1,4 @@
-@import 'https://fonts.googleapis.com/css?family=Catamaran';
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
 
 html, body
 {
@@ -6,7 +6,7 @@ html, body
 	min-height: 100%;
 	margin: 0;
 	padding: 0;
-	font-family: 'Catamaran', sans-serif;
+	font-family: 'Fredoka One', cursive;
 }
 
 body 
@@ -43,4 +43,22 @@ body
 .status
 {
   font-size: 3rem;
+}
+
+#loading
+{
+    position: absolute;
+    background-color: #3A3F69;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    font-family: 'Fredoka One', cursive;
 }
