@@ -11,8 +11,24 @@ const DIRECTION = {
 	right: 'RIGHT'
 }
 
+const GAME_STATE = {
+	loading: 'loading',
+	intro: 'intro',
+	waiting: 'waiting',
+	game: 'game'
+}
+
+let gameState = GAME_STATE.loading;
+
+let physicsItems = [];
 let stage;
 let physics;
+
+let showGuides = false;
+
+let count = 0;
+let cannonFlash;
+let cannonRecoil;
 
 // class ChristmasCannon
 // {
@@ -37,31 +53,272 @@ let physics;
 // 			height: 30
 // 		}
 
-// 		stage = new Stage(worldScale, stageSize, onReady);
-// 		physics = new Physics(worldScale, stageSize);
-
 // 		this.stage = new Stage(worldScale, stageSize, onReady);
 // 		this.physics = new Physics(worldScale, stageSize);
 // 	}
+
+// 	createListeners()
+// 	{
+// 		window.addEventListener( 'resize', () => { stage.onResize() }, false );
+// 		document.addEventListener( 'keypress', onDocumentKeyPress, false );
+// 		document.addEventListener( 'click', onDocumentKeyPress, false );
+// 	}
 // }
 
-const introSteps = [init];
+const introSteps = [init, prepUI, loadComplete, dropIn, createClickListeners, introRoom, introCannon, introStart, startGame];
 
 function next() 
 {
-	introSteps.shift()();
+	if(introSteps.length)
+	{
+		introSteps.shift()();
+	}
+	else
+	{
+		console.error(`Well this shouldn't have happened.`)
+	}
+}
+
+function loadComplete()
+{
+	const loadingScreen = document.querySelector('#loading');
+	loadingScreen.innerHTML = '';
+	setState(GAME_STATE.intro);
+
+	gsap.to(loadingScreen, {autoAlpha: 0, duration: 1.5});
+	setTimeout(() => next(), 1000);
+}
+
+function prepUI()
+{
+	gsap.set('#steve', {y: '50%', scale: 0, rotation: 45});
+	gsap.set('#bubble', {transformOrigin: '100% 50%', autoAlpha: 0, x:'+=50', rotation: 5, scale: 0.9})
+
+	next();
+}
+
+function dropIn()
+{
+	createSofa();
+	createTable();
+	createStand();
+	createTV();
+
+	next();
+}
+
+function setState(newState)
+{
+	gameState = newState;
+	document.body.setAttribute('class', gameState);
+}
+
+function createClickListeners()
+{
+	document.addEventListener( 'keypress', onClick, false );
+	document.addEventListener( 'click', onClick, false );
+
+	next();
+}
+
+function introRoom()
+{
+	setState(GAME_STATE.intro);
+	let roomTL = gsap.timeline({onComplete: () => setState(GAME_STATE.waiting)});
+	roomTL.to('#steve', {delay:1, y: 0, rotation: 0, scale: 1, ease: 'power4.out', duration: 0.6})
+	roomTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1})
+}
+
+function introCannon()
+{
+	setState(GAME_STATE.intro);
+	const steveEl = document.querySelector('#steve');
+	const textEl = document.querySelector('#text');
+	const textHighlightEl = document.querySelector('#text-highlight');
+
+	let cannonTL = gsap.timeline({onComplete: () => setState(GAME_STATE.waiting), defaults: { ease: 'power4.easeInOut', duration: .8}});
+	cannonTL.to(stage.camera.position, {x: 65, y: -20, z: 20})
+	cannonTL.to(stage.cameraTarget, {x: 30, y: -25, z: 30}, 0)
+	cannonTL.to('#bubble', {autoAlpha: 0, y:'-=30', scale: 0.5, duration: 0.3, ease: 'power2.in'}, 0);
+	cannonTL.to(steveEl, {y: '-=20', duration: 0.1, onComplete: () => {
+		steveEl.setAttribute('src', '/images/steves/happy.svg');
+		textEl.textContent = "But wait, we have this ";
+		textHighlightEl.textContent = "Christmas Cannon!!";
+	}}, 0.5)
+	cannonTL.to(steveEl, {y: 0, duration: .7, ease: 'bounce'}, 0.6);
+	cannonTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1}, 1);
+}
+
+function introStart()
+{
+	setState(GAME_STATE.intro);
+	const steveEl = document.querySelector('#steve');
+	const textEl = document.querySelector('#text');
+	const textHighlightEl = document.querySelector('#text-highlight');
+
+	let cannonTL = gsap.timeline({onComplete: () => setState(GAME_STATE.game), defaults: { ease: 'power4.easeInOut', duration: .8}});
+	cannonTL.to(stage.camera.position, {x: 55, y: 15, z: 55})
+	cannonTL.to(stage.cameraTarget, {x: 0, y: -22, z: 0}, 0)
+	cannonTL.to('#bubble', {autoAlpha: 0, y:'-=30', scale: 0.5, duration: 0.3, ease: 'power2.in'}, 0);
+	cannonTL.to(steveEl, {y: '-=20', duration: 0.1, onComplete: () => {
+		steveEl.setAttribute('src', '/images/steves/steve.svg');
+		textEl.textContent = "Click or tap to fire the Christmas Cannon, let’s make this room more festive!!";
+		textHighlightEl.textContent = "";
+	}}, 0.5)
+	cannonTL.to(steveEl, {y: 0, duration: .7, ease: 'bounce'}, 0.6);
+	cannonTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1}, 1);
+}
+
+function startGame()
+{
+	setState(GAME_STATE.game);
+
+	let gameStartTL = gsap.timeline({defaults: { ease: 'power4.easeInOut', duration: .5}});
+	gameStartTL.to('#bubble', {autoAlpha: 0, y:'-=30', scale: 0.5, duration: 0.3, ease: 'power2.in'}, 0);
+	gameStartTL.to('#steve', {y: '100%', scale: 0, rotation: 45}, 0)
+}
+
+function onClick(event)
+{
+	if(event) event.preventDefault();
+
+	switch(gameState)
+	{
+		case GAME_STATE.waiting:
+			next();
+			break;
+		case GAME_STATE.game:
+			fire();
+			break;
+		default:
+			return;
+	}
+	
+}
+
+function fire()
+{
+	if(count === 0) next();
+	count++;
+	if(count === 10) createTree();
+	else addBall();
+	cannonFlash.restart();
+	cannonRecoil.restart();
+}
+
+function onReady()
+{
+	// createTree();
+
+	setState(GAME_STATE.intro);
+
+	cannonFlash = gsap.timeline();
+	cannonFlash.fromTo(stage.cannonLight, {intensity: 2}, {intensity: 0, duration: .3});
+
+	cannonRecoil = gsap.timeline();
+	cannonRecoil.to(stage.models.cannon.position, {x: '+=3', z: '+=3', duration: 0.1, ease: 'Power2.out'}).to(stage.models.cannon.position, {x: '-=3', z: '-=3', duration: 0.4})
+	// cannonFlash.stop();
+
+
+	
+
+	animate();
+
+	next();
+}
+
+
+
+
+function addBall()
+{		
+	// gsap.to(stage.cameraTarget, {x: stageSize.left + (stageSize.width * 0.5), ease: 'Power4.inOut', duration: 1})
+
+	
+	
+	var size = .5;
+	let x = 35;
+	let y = -15;
+	let z = 35;
+	
+	let width = 1 + Math.random() * 4;
+	let height = 1 + Math.random() * 4;
+	let depth = 1 + Math.random() * 4;
+		
+	let isBall = Math.random() > 0.5;
+	
+	
+	
+	var physicsItem = { 
+		mesh: isBall ? stage.createBall(size, Math.random() * 0xFFFFFF, Math.random() > 0.5) : stage.createBox(width, height, depth, 0xFFFFFF, true),
+		physics: isBall ? physics.createBall(size, x, y, z) : physics.createBox(width, height, depth, x, y, z, 2),
+		previousPosition: new CANNON.Vec3(x, y, z),
+		rotation: 0,
+		rotationVelocity: 0
+	}
+	
+	// physicsItem.physics.velocity.set(-20 - (Math.random() * 50), 1 + (Math.random() * 10), -20 - (Math.random() * 50))
+
+
+	// -60 => -20
+
+	// 10 => 30
+
+	// -20 => -60
+
+	physicsItem.physics.velocity.set(-60, 10, -60)
+	const angularRandomness = 10;
+	physicsItem.physics.angularVelocity.set(
+		((Math.random() * angularRandomness) - (angularRandomness/2)),
+		((Math.random() * angularRandomness) - (angularRandomness/2)),
+		((Math.random() * angularRandomness) - (angularRandomness/2)))
+	physicsItem.physics.angularDamping = 0.8;
+	
+	physicsItems.push(physicsItem);
+
+	// if(pauseTimer) clearTimeout(pauseTimer);
+	// pauseTimer = setTimeout( _ => doPhysics = false, 7000);
+}
+
+function createStaticBox(settings)
+{
+	// const z = 1;
+	var physicsItem = { 
+		mesh: settings.show ? stage.createBox(settings.width, settings.height, settings.depth, settings.color) : null,
+		physics: physics.createBox(settings.width, settings.height, settings.depth, settings.x, settings.y, settings.z, 0, settings.rotation, settings.trigger),
+		previousPosition: new CANNON.Vec3(settings.x, settings.y, settings.z),
+		rotation: settings.rotation,
+		rotationVelocity: 0
+	}
+	physicsItems.push(physicsItem);
+
+	return physicsItem
+}
+
+function animate() 
+{
+	physics.tick()
+
+	for(var i in physicsItems)
+	{
+		if(physicsItems[i].mesh)
+		{
+			physicsItems[i].mesh.position.copy(physicsItems[i].physics.position);
+			physicsItems[i].mesh.quaternion.copy(physicsItems[i].physics.quaternion);	
+		}
+		
+	}
+
+	stage.render();
+
+	requestAnimationFrame( animate );
 }
 
 function init()
 {
-	
 	console.log('init()');
 
-	let showGuides = false;
 
-	// animations
-	let cannonFlash;
-	let cannonRecoil;
 
 	let worldScale = 1;
 
@@ -75,35 +332,8 @@ function init()
 	stage = new Stage(worldScale, stageSize, onReady);
 	physics = new Physics(worldScale, stageSize);
 	
-	// let editablePhysics = {};
-
-	// const settings = {
-	// 	area: {
-	// 		y:[]
-	// 	}
-	// 	startY: 0,
-	// 	endY: -100
-	// }
-
-	// stage.setPlane(physics.groundBody);
-
 	window.addEventListener( 'resize', () => { stage.onResize() }, false );
-	document.addEventListener( 'keypress', onDocumentKeyPress, false );
-	document.addEventListener( 'click', onDocumentKeyPress, false );
 
-	let letters = [];
-	let count = 0;
-	let physicsItems = [];
-	
-	let pauseTimer = null;
-	let doPhysics = false;
-
-	// gsap.to('body', {
-	// 	scrollTrigger: {
-	// 		trigger: '#trigger1',
-	// 		onToggle: () => addBall('A')
-	// 	}
-	// })
 
 
 
@@ -190,10 +420,17 @@ function init()
 
 	staticItems.forEach(settings => {
 		createStaticBox(settings);
-		// if(settings.name) editablePhysics[settings.name] = item;
 	})
 
-	function createSofa()
+	
+
+	
+
+	
+	// addBall();
+}
+
+function createSofa()
 	{
 		let body = physics.createBody(10, {x: 12, y: -10, z: 2}, {y: Math.PI * 1.023, x: Math.PI * 0.01}, PHYSICS_MATERIAL.lowBounce);
 
@@ -547,170 +784,5 @@ function init()
 		
 		physicsItems.push(physicsItem);
 	}
-
-	function onReady()
-	{
-		// createTree();
-
-
-
-		cannonFlash = gsap.timeline();
-		cannonFlash.fromTo(stage.cannonLight, {intensity: 4}, {intensity: 0, duration: .3});
-
-		cannonRecoil = gsap.timeline();
-		cannonRecoil.to(stage.models.cannon.position, {x: '+=3', z: '+=3', duration: 0.1, ease: 'Power2.out'}).to(stage.models.cannon.position, {x: '-=3', z: '-=3', duration: 0.4})
-		// cannonFlash.stop();
-
-
-		createSofa();
-		createTable();
-		createStand();
-		createTV();
-
-		doPhysics = true;
-
-		animate();
-	}
-
-	function setDirection(direction)
-	{
-		updateStatus(1, direction);
-		// gsap.to(stage.cameraTarget, {x: stageSize.left + ((direction == DIRECTION.left) ? stageSize.width * 0.3 : stageSize.width * 0.7) * worldScale, ease: 'Power4.inOut', duration: 1.3})
-	}
-
-	function updateStatus(id, copy)
-	{
-		let statusElement = document.getElementById('status-' + id);
-		if(statusElement)
-		{
-			statusElement.innerHTML = copy;
-		}
-		else
-		{
-			console.error('No status element with id', id);
-		}
-	}
-
-	function updateVelocity(item)
-	{
-		let velocities = [
-			(item.physics.position.x - item.previousPosition.x) * 60,
-			(item.physics.position.y - item.previousPosition.y) * 60,
-			(item.physics.position.z - item.previousPosition.z) * 60
-		]
-
-		item.previousPosition.set(item.physics.position.x, item.physics.position.y, item.physics.position.z);
-		item.physics.velocity.set(...velocities);
-	}
-
-	function updateRotation(item)
-	{
-		physics.setAngle(item.physics, item.rotationVelocity);
-	}
-
-	function addBall()
-	{		
-		// gsap.to(stage.cameraTarget, {x: stageSize.left + (stageSize.width * 0.5), ease: 'Power4.inOut', duration: 1})
-
-		
-		
-		var size = .5;
-		let x = 35;
-		let y = -15;
-		let z = 35;
-		
-		let width = 1 + Math.random() * 4;
-		let height = 1 + Math.random() * 4;
-		let depth = 1 + Math.random() * 4;
-			
-		let isBall = Math.random() > 0.5;
-		
-		
-		
-		var physicsItem = { 
-			mesh: isBall ? stage.createBall(size, Math.random() * 0xFFFFFF, Math.random() > 0.5) : stage.createBox(width, height, depth, 0xFFFFFF, true),
-			physics: isBall ? physics.createBall(size, x, y, z) : physics.createBox(width, height, depth, x, y, z, 2),
-			previousPosition: new CANNON.Vec3(x, y, z),
-			rotation: 0,
-			rotationVelocity: 0
-		}
-		
-		// physicsItem.physics.velocity.set(-20 - (Math.random() * 50), 1 + (Math.random() * 10), -20 - (Math.random() * 50))
-
-
-		// -60 => -20
-
-		// 10 => 30
-
-		// -20 => -60
-
-		physicsItem.physics.velocity.set(-60, 10, -60)
-		const angularRandomness = 10;
-		physicsItem.physics.angularVelocity.set(
-			((Math.random() * angularRandomness) - (angularRandomness/2)),
-			((Math.random() * angularRandomness) - (angularRandomness/2)),
-			((Math.random() * angularRandomness) - (angularRandomness/2)))
-		physicsItem.physics.angularDamping = 0.8;
-		
-		physicsItems.push(physicsItem);
-	
-		// if(pauseTimer) clearTimeout(pauseTimer);
-		// pauseTimer = setTimeout( _ => doPhysics = false, 7000);
-	}
-
-	function createStaticBox(settings)
-	{
-		// const z = 1;
-		var physicsItem = { 
-			mesh: settings.show ? stage.createBox(settings.width, settings.height, settings.depth, settings.color) : null,
-			physics: physics.createBox(settings.width, settings.height, settings.depth, settings.x, settings.y, settings.z, 0, settings.rotation, settings.trigger),
-			previousPosition: new CANNON.Vec3(settings.x, settings.y, settings.z),
-			rotation: settings.rotation,
-			rotationVelocity: 0
-		}
-		physicsItems.push(physicsItem);
-
-		return physicsItem
-	}
-
-	function fire()
-	{
-		count++;
-		if(count === 10) createTree();
-		else addBall();
-		cannonFlash.restart();
-		cannonRecoil.restart();
-		
- 	}
-	
-	function onDocumentKeyPress( event )
-	{
-		event.preventDefault();
-
-		if(stage) fire()
-	}
-	
-	function animate() 
-	{
-		if(doPhysics) physics.tick()
-
-		for(var i in physicsItems)
-		{
-			if(physicsItems[i].mesh)
-			{
-				physicsItems[i].mesh.position.copy(physicsItems[i].physics.position);
-				physicsItems[i].mesh.quaternion.copy(physicsItems[i].physics.quaternion);	
-			}
-			
-		}
-
-		stage.render();
-
-		requestAnimationFrame( animate );
-	}
-
-	
-	// addBall();
-}
 
 next();

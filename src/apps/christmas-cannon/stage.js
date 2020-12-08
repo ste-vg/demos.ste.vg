@@ -93,7 +93,7 @@ class Stage
 		this.scene.add( shadowLight );
 
 		this.cannonLight = new PointLight( 0xEDB458, 0, 100, 2);
-		this.cannonLight.position.set(40, -20, 40)
+		this.cannonLight.position.set(28, -20, 28)
 		this.cannonLight.castShadow = true;
 		this.cannonLight.shadow.radius = 2;
 		this.cannonLight.shadow.mapSize.width = 256; 
@@ -129,10 +129,10 @@ class Stage
 		// CAMERA
 
 		this.camera = new PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 5, 400  );
-		// this.camera.position.set(55, 15, 55);
-		// this.cameraTarget = new Vector3( 0, -22, 0 );
-		this.camera.position.set(65, -20, 20);
-		this.cameraTarget = new Vector3( 30, -25, 30 );
+		this.camera.position.set(55, 15, 55);
+		this.cameraTarget = new Vector3( 0, -22, 0 );
+		// this.camera.position.set(65, -20, 20);
+		// this.cameraTarget = new Vector3( 30, -25, 30 );
         
         let center = new Vector3((this.stageSize.left + (this.stageSize.width / 2)) * scale, (this.stageSize.top - (this.stageSize.height / 2)) * scale, 0)
         const previewCameraDistance = 70 * scale;

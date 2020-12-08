@@ -14,8 +14,23 @@ tags: demos
 </style>
 
 <div id="canvas-container"></div>
+<div id="ui">
+    <div class="positioner">
+        <div class="jolly-o-meter"></div>
+        <div class="speech-bubble">
+            <div id="bubble">
+                <span id="text">Oh no! Look at this dull room, not at all Christmassy.</span>
+                <span id="text-highlight"></span>
+                <div id="next">Next</div>
+            </div>
+        </div>
 
+            <img id="steve" src="/images/steves/sad.svg" alt="Steve">
+
+    </div>
+</div>
 <div id="loading">Loading</div>
+
 
 {% set js %}
     {% include "compiled/christmas-cannon.js" %}
