@@ -88,8 +88,8 @@ class Stage
 		shadowLight.position.set( 10, 0, 4 );
 		shadowLight.castShadow = true;
 		shadowLight.shadow.radius = 16;
-		shadowLight.shadow.mapSize.width = 1024; 
-		shadowLight.shadow.mapSize.height = 1024;
+		shadowLight.shadow.mapSize.width = 2048; 
+		shadowLight.shadow.mapSize.height = 2048;
 		this.scene.add( shadowLight );
 
 		this.cannonLight = new PointLight( 0xEDB458, 0, 100, 2);

@@ -24,6 +24,8 @@ let physicsItems = [];
 let stage;
 let physics;
 
+let mousePos = {x: 0, y: 0};
+
 let showGuides = false;
 
 let count = 0;
@@ -113,10 +115,16 @@ function setState(newState)
 	document.body.setAttribute('class', gameState);
 }
 
+function onMouseMove(event)
+{
+	mousePos = {x: event.clientX, y: event.clientY};
+}
+
 function createClickListeners()
 {
 	document.addEventListener( 'keypress', onClick, false );
 	document.addEventListener( 'click', onClick, false );
+	document.addEventListener( 'mousemove', onMouseMove, false );
 
 	next();
 }
@@ -158,7 +166,7 @@ function introStart()
 
 	let cannonTL = gsap.timeline({onComplete: () => setState(GAME_STATE.game), defaults: { ease: 'power4.easeInOut', duration: .8}});
 	cannonTL.to(stage.camera.position, {x: 55, y: 15, z: 55})
-	cannonTL.to(stage.cameraTarget, {x: 0, y: -22, z: 0}, 0)
+	cannonTL.to(stage.cameraTarget, {x: 0, y: -22, z: 0, duration: 1.4}, 0)
 	cannonTL.to('#bubble', {autoAlpha: 0, y:'-=30', scale: 0.5, duration: 0.3, ease: 'power2.in'}, 0);
 	cannonTL.to(steveEl, {y: '-=20', duration: 0.1, onComplete: () => {
 		steveEl.setAttribute('src', '/images/steves/steve.svg');
@@ -182,13 +190,19 @@ function onClick(event)
 {
 	if(event) event.preventDefault();
 
+	let coords = {
+		x: event.clientX || mousePos.x,
+		y: event.clientY || mousePos.y
+	}
+	
+
 	switch(gameState)
 	{
 		case GAME_STATE.waiting:
 			next();
 			break;
 		case GAME_STATE.game:
-			fire();
+			fire(coords);
 			break;
 		default:
 			return;
@@ -196,12 +210,53 @@ function onClick(event)
 	
 }
 
-function fire()
+function fire(coords)
 {
 	if(count === 0) next();
 	count++;
-	if(count === 10) createTree();
-	else addBall();
+	let item;
+	if(count === 10) item = createTree();
+	else item = addBall();
+
+	let range = stage.height * 0.4;
+	let x = -60;
+	// let y = 20;
+	let z = -60;
+
+	let xStart = (stage.width / 2) - range;
+	let xEnd = (stage.width / 2) + range;
+	if(coords.x > stage.width / 2)
+	{
+		if(coords.x > xEnd) x = -20;
+		else
+		{
+			let r = coords.x - (stage.width / 2)
+			x = -20 + ((range - r) / range) * -40;
+		}
+	}
+	
+	// let yStart = (stage.width / 2);
+	if(coords.x < stage.width / 2)
+	{
+		if(coords.x < xStart) z = -20;
+		else
+		{
+			let r = coords.x - xStart;
+			z = -20 + (r / range) * -40;
+		}
+	}
+
+	let hRange = 100;
+	let y = 60 - (coords.y / stage.height) * hRange;
+
+	item.physics.velocity.set(x, y, z)
+	const angularRandomness = 10;
+	item.physics.angularVelocity.set(
+		((Math.random() * angularRandomness) - (angularRandomness/2)),
+		((Math.random() * angularRandomness) - (angularRandomness/2)),
+		((Math.random() * angularRandomness) - (angularRandomness/2)))
+	item.physics.angularDamping = 0.8;
+	
 	cannonFlash.restart();
 	cannonRecoil.restart();
 }
@@ -266,15 +321,17 @@ function addBall()
 
 	// -20 => -60
 
-	physicsItem.physics.velocity.set(-60, 10, -60)
-	const angularRandomness = 10;
-	physicsItem.physics.angularVelocity.set(
-		((Math.random() * angularRandomness) - (angularRandomness/2)),
-		((Math.random() * angularRandomness) - (angularRandomness/2)),
-		((Math.random() * angularRandomness) - (angularRandomness/2)))
-	physicsItem.physics.angularDamping = 0.8;
+	// physicsItem.physics.velocity.set(-60, 10, -60)
+	// const angularRandomness = 10;
+	// physicsItem.physics.angularVelocity.set(
+	// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+	// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+	// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+	// physicsItem.physics.angularDamping = 0.8;
 	
 	physicsItems.push(physicsItem);
+
+	return physicsItem;
 
 	// if(pauseTimer) clearTimeout(pauseTimer);
 	// pauseTimer = setTimeout( _ => doPhysics = false, 7000);
@@ -432,7 +489,7 @@ function init()
 
 function createSofa()
 	{
-		let body = physics.createBody(10, {x: 12, y: -10, z: 2}, {y: Math.PI * 1.023, x: Math.PI * 0.01}, PHYSICS_MATERIAL.lowBounce);
+		let body = physics.createBody(5, {x: 12, y: -10, z: 2}, {y: Math.PI * 1.023, x: Math.PI * 0.01}, PHYSICS_MATERIAL.lowBounce);
 
 		let shapes = [{
 			show: false,
@@ -774,15 +831,17 @@ function createSofa()
 			physics: body,
 		}
 		
-		body.velocity.set(-40, 30, -40)
-		const angularRandomness = 5;
-		body.angularVelocity.set(
-			((Math.random() * angularRandomness) - (angularRandomness/2)),
-			((Math.random() * angularRandomness) - (angularRandomness/2)),
-			((Math.random() * angularRandomness) - (angularRandomness/2)))
-		body.angularDamping = 0.8;
+		// body.velocity.set(-40, 30, -40)
+		// const angularRandomness = 5;
+		// body.angularVelocity.set(
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+		// body.angularDamping = 0.8;
 		
 		physicsItems.push(physicsItem);
+
+		return physicsItem;
 	}
 
 next();

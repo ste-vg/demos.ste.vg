@@ -28,6 +28,7 @@ body
   width: calc(80vw - 80px);
   padding: 20px 40px;
   margin: 0;
+  
 }
 
 #canvas-container
@@ -36,6 +37,7 @@ body
     top: 0;
     left: 0;
     z-index: 1;
+    
 }
 
 .spacer
@@ -147,4 +149,9 @@ body
   {
     opacity: 1;
   }
+}
+
+.game
+{
+  cursor: url(/images/crosshair.svg) 41 41, auto;
 }

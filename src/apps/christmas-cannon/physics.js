@@ -59,7 +59,6 @@ class Physics
 
 		Object.keys(rotation || {}).forEach(key => 
 		{
-			console.log('key', key)
 			this.setAngle(body, rotation[key], key);
 		})
 		this.world.addBody(body);
