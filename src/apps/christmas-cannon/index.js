@@ -177,6 +177,44 @@ function introStart()
 	cannonTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1}, 1);
 }
 
+function endMessage()
+{
+	const steveEl = document.querySelector('#steve');
+	const textEl = document.querySelector('#text');
+	const textHighlightEl = document.querySelector('#text-highlight');
+
+	let changed = false;
+	steveEl.addEventListener('click', (event) => {
+		event.stopPropagation();
+		if(!changed)
+		{
+			changed = true;
+			let steveTL = gsap.timeline();
+			steveTL.to(steveEl, {y: '-=40', duration: 0.1, onComplete: () => {
+				steveEl.setAttribute('src', '/images/steves/snowman.svg');
+			}}, 0)
+			steveTL.to(steveEl, {y: 0, duration: .7, ease: 'bounce'}, 0.1);
+		}
+		else window.open('https://ste.vg/pJ96mS5DC','_blank');
+	})
+	
+	textEl.addEventListener('click', (event) => {
+		event.stopPropagation();
+		window.open('https://twitter.com/steeevg/','_blank');
+	})
+
+	// steveEl.setAttribute('src', '/images/steves/snowman.svg');
+	textEl.innerHTML = `Yay! Sooo much better.`
+
+
+// Be sure to send a screenshot to <a href="https://twitter.com/steeevg/" target="_blank">@steeevg</a>, he’d love to see it!`;
+	textHighlightEl.textContent = "Merry Christmas!";
+
+	let roomTL = gsap.timeline();
+	roomTL.to('#steve', {y: 0, rotation: 0, scale: 1, ease: 'power4.out', duration: 0.6})
+	roomTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1})
+}
+
 function startGame()
 {
 	setState(GAME_STATE.game);
@@ -217,6 +255,11 @@ function fire(coords)
 	let item;
 	if(count === 10) item = createTree();
 	else item = addBall();
+
+	if(count === 100)
+	{
+		setTimeout(() => endMessage(), 1000);
+	}
 
 	let range = stage.height * 0.4;
 	let x = -60;
@@ -291,7 +334,6 @@ function addBall()
 
 	
 	
-	var size = .5;
 	let x = 35;
 	let y = -15;
 	let z = 35;
@@ -299,13 +341,14 @@ function addBall()
 	let width = 1 + Math.random() * 4;
 	let height = 1 + Math.random() * 4;
 	let depth = 1 + Math.random() * 4;
-		
+	
 	let isBall = Math.random() > 0.5;
 	
-	
+	let light = Math.random() > 0.8;
+	var size = light ? .5 : .8;
 	
 	var physicsItem = { 
-		mesh: isBall ? stage.createBall(size, Math.random() * 0xFFFFFF, Math.random() > 0.5) : stage.createBox(width, height, depth, 0xFFFFFF, true),
+		mesh: isBall ? stage.createBall(size, Math.random() * 0xFFFFFF, light) : stage.createBox(width, height, depth, 0xFFFFFF, true),
 		physics: isBall ? physics.createBall(size, x, y, z) : physics.createBox(width, height, depth, x, y, z, 2),
 		previousPosition: new CANNON.Vec3(x, y, z),
 		rotation: 0,
@@ -386,7 +429,7 @@ function init()
 		height: 30
 	}
 
-	stage = new Stage(worldScale, stageSize, onReady);
+	stage = new Stage(worldScale, stageSize, onReady, showGuides);
 	physics = new Physics(worldScale, stageSize);
 	
 	window.addEventListener( 'resize', () => { stage.onResize() }, false );
@@ -542,6 +585,8 @@ function createSofa()
 			rotation: -Math.PI * 0.4
 		}];
 
+		stage.models.sofa.position.y = 0;
+
 		let sofaGroup = new Group();
 		sofaGroup.add(stage.models.sofa)
 		stage.scene.add(sofaGroup);
@@ -628,6 +673,8 @@ function createSofa()
 			},
 		];
 
+		stage.models.table.position.y = 0;
+
 		let tableGroup = new Group();
 		tableGroup.add(stage.models.table)
 		stage.scene.add(tableGroup);
@@ -678,6 +725,8 @@ function createSofa()
 			}
 			
 		];
+
+		stage.models.stand.position.y = 0;
 
 		let standGroup = new Group();
 		standGroup.add(stage.models.stand)
@@ -738,6 +787,8 @@ function createSofa()
 			}
 			
 		];
+
+		stage.models.tv.position.y = 0;
 
 		let tvGroup = new Group();
 		tvGroup.add(stage.models.tv)
@@ -806,6 +857,9 @@ function createSofa()
 				segments: 7
 			}
 		];
+
+		stage.models.tree.position.y = 0;
+		stage.models.pot.position.y = 0;
 
 		let treeGroup = new Group();
 		treeGroup.add(stage.models.tree);

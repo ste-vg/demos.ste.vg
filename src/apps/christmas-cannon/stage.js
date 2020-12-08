@@ -15,11 +15,11 @@ import Stats from "three/examples/jsm/libs/stats.module";
 
 class Stage 
 {
-	constructor(scale, stageSize, onReady)
+	constructor(scale, stageSize, onReady, showStats)
 	{
 		const manager = new LoadingManager();
 		
-
+		this.showStats = showStats;
 		this.models = {};
 		this.stats = new Stats();
 
@@ -124,7 +124,7 @@ class Stage
 		
 		this.container = document.getElementById( 'canvas-container' );
 		this.container.appendChild( this.renderer.domElement );
-		this.container.appendChild( this.stats.dom );
+		if(this.showStats) this.container.appendChild( this.stats.dom );
 
 		// CAMERA
 
@@ -179,6 +179,7 @@ class Stage
 		///=================
 		
 		let sofaGroup = new Group();
+		sofaGroup.position.y = 1000;
 		this.scene.add(sofaGroup);
 
 		var sofaLoader = new GLTFLoader(manager);
@@ -211,6 +212,7 @@ class Stage
 		///=================
 
 		let treeGroup = new Group();
+		treeGroup.position.y = 1000;
 		this.scene.add( treeGroup );
 		
 		var treeLoader = new GLTFLoader(manager);
@@ -221,7 +223,7 @@ class Stage
 			object.scene.rotation.x = Math.PI * 0.5;
 			  
 			treeGroup.add( object.scene );
-			// treeGroup.position.y = 100;
+			treeGroup.position.y = 1000;
 			
 			object.scene.traverse( function( child ) { 
 
@@ -256,7 +258,7 @@ class Stage
 			object.scene.rotation.y = -Math.PI * 0.5;
 		  	fireplaceGroup.add( object.scene );
 		  	
-			// this.fireplaceGroup.position.y = 100;
+			
 			
 			object.scene.traverse( function( child ) { 
 
@@ -281,6 +283,7 @@ class Stage
 		///=================
 
 		let tableGroup = new Group();
+		tableGroup.position.y = 1000;
 		this.scene.add( tableGroup );
 		
 		var tableLoader = new GLTFLoader(manager);
@@ -313,6 +316,7 @@ class Stage
 		///=================
 
 		let standGroup = new Group();
+		standGroup.position.y = 1000;
 		this.scene.add( standGroup );
 		
 		var tableLoader = new GLTFLoader(manager);
@@ -344,6 +348,7 @@ class Stage
 		///=================
 
 		let tvGroup = new Group();
+		tvGroup.position.y = 1000;
 		this.scene.add( tvGroup );
 		
 		var tableLoader = new GLTFLoader(manager);
@@ -376,6 +381,7 @@ class Stage
 		///=================
 
 		let potGroup = new Group();
+		potGroup.position.y = 1000;
 		this.scene.add( potGroup );
 		
 		var tableLoader = new GLTFLoader(manager);
@@ -472,7 +478,7 @@ class Stage
 // 		}
 		this.renderer.render( this.scene, this.camera );
 
-		this.stats.update();
+		if(this.showStats) this.stats.update();
 	}
 	
 	onResize() 
@@ -517,11 +523,22 @@ class Stage
 		}
 		
 		let group = new Group();
-		let geometry = new IcosahedronGeometry(size, 4);
 		let material = new MeshPhongMaterial ( { color: color, wireframe: false } );
-		let mesh = new Mesh( geometry, material );
+		let ball = new IcosahedronGeometry(size, 4);
+		let mesh = new Mesh( ball, material );
 		mesh.castShadow = true;
 		group.add(mesh);
+		
+		if(!light)
+		{
+			let cap = new CylinderGeometry( size / 2, size / 2,  size, 5 );
+			let capMat = new MeshPhongMaterial ( { color: 0xFFD338, wireframe: false } );
+			let capMesh = new Mesh( cap, capMat );
+			capMesh.castShadow = true;
+			capMesh.position.y = size * 0.75;
+			group.add(capMesh);
+
+		}
 
 		this.scene.add(group);
 		return group;
