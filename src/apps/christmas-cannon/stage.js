@@ -441,6 +441,38 @@ class Stage
 		});
 
 
+		///=================
+		//    SNOWMAN
+		///=================
+
+		let snowmanGroup = new Group();
+		snowmanGroup.position.y = 1000;
+		this.scene.add( snowmanGroup );
+		
+		var tableLoader = new GLTFLoader(manager);
+		tableLoader.load("/models/snowman.gltf", object => {
+
+			//object.scene.position.set(30, -30, 30);
+			object.scene.scale.set(2.5, 2.5, 2.5);
+			// object.scene.rotation.y = Math.PI * 1.25;
+		  	snowmanGroup.add( object.scene );
+			
+			object.scene.traverse( function( child ) { 
+
+				if ( child.isMesh ) {
+					child.castShadow = true;
+				}
+				if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.snowman = snowmanGroup;
+		});
+
+
 
 		this.onResize();
 	}
@@ -507,6 +539,17 @@ class Stage
 		let geometry = new BoxGeometry( width * this.scale, height * this.scale, depth * this.scale );
 		let texture = present ? this.presentTextures[Math.floor(Math.random() * this.presentTextures.length)] : null;
 		let material = new MeshPhongMaterial( { color: color, shininess: present ? 100 : 30, map: texture } );
+		let mesh = new Mesh( geometry, material );
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+		this.scene.add(mesh);
+		return mesh;
+	}
+	
+	createSphere(radius, color)
+	{
+		let geometry = new IcosahedronGeometry(radius, 3);
+		let material = new MeshPhongMaterial( { color: color, shininess: 30 } );
 		let mesh = new Mesh( geometry, material );
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;

@@ -76,6 +76,11 @@ class Physics
 		return new CANNON.Cylinder(radiusTop, radiusBottom,  height, segments);
 	}
 
+	createSphereShape(radius)
+	{
+		return new CANNON.Sphere(radius);
+	}
+
 	// createCylinder(x, y, z, radiusTop, radiusBottom,  height, numSegments)
 	// {
 	// 	let shape = new CANNON.Cylinder(radiusTop, radiusBottom,  height, numSegments);

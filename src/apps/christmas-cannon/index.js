@@ -18,6 +18,12 @@ const GAME_STATE = {
 	game: 'game'
 }
 
+let sounds = {
+	fire: [new Audio('/sounds/fire_01.mp3'), new Audio('/sounds/fire_02.mp3')],
+	bells: [new Audio('/sounds/bells_01.mp3')],
+	bing: [new Audio('/sounds/bing_01.mp3'), new Audio('/sounds/bing_02.mp3')]
+};
+
 let gameState = GAME_STATE.loading;
 
 let physicsItems = [];
@@ -133,8 +139,9 @@ function introRoom()
 {
 	setState(GAME_STATE.intro);
 	let roomTL = gsap.timeline({onComplete: () => setState(GAME_STATE.waiting)});
-	roomTL.to('#steve', {delay:1, y: 0, rotation: 0, scale: 1, ease: 'power4.out', duration: 0.6})
+	roomTL.to('#steve', {delay:1, y: 0, rotation: 0, scale: 1, ease: 'power4.out', duration: 0.6, onComplete:() => playSound('bing')})
 	roomTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1})
+	
 }
 
 function introCannon()
@@ -152,9 +159,11 @@ function introCannon()
 		steveEl.setAttribute('src', '/images/steves/happy.svg');
 		textEl.textContent = "But wait, we have this ";
 		textHighlightEl.textContent = "Christmas Cannon!!";
+		setTimeout(() => playSound('bing'),300);
+
 	}}, 0.5)
+	cannonTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1});
 	cannonTL.to(steveEl, {y: 0, duration: .7, ease: 'bounce'}, 0.6);
-	cannonTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1}, 1);
 }
 
 function introStart()
@@ -172,9 +181,10 @@ function introStart()
 		steveEl.setAttribute('src', '/images/steves/steve.svg');
 		textEl.textContent = "Click or tap to fire the Christmas Cannon, let’s make this room more festive!!";
 		textHighlightEl.textContent = "";
+		setTimeout(() => playSound('bing'),700);
 	}}, 0.5)
+	cannonTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1});
 	cannonTL.to(steveEl, {y: 0, duration: .7, ease: 'bounce'}, 0.6);
-	cannonTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1}, 1);
 }
 
 function endMessage()
@@ -204,15 +214,27 @@ function endMessage()
 	})
 
 	// steveEl.setAttribute('src', '/images/steves/snowman.svg');
-	textEl.innerHTML = `Yay! Sooo much better.`
+	textEl.innerHTML = `Yay! So much better.`
 
 
 // Be sure to send a screenshot to <a href="https://twitter.com/steeevg/" target="_blank">@steeevg</a>, he’d love to see it!`;
 	textHighlightEl.textContent = "Merry Christmas!";
 
 	let roomTL = gsap.timeline();
+	setTimeout(() => playSound('bing'),700);
 	roomTL.to('#steve', {y: 0, rotation: 0, scale: 1, ease: 'power4.out', duration: 0.6})
 	roomTL.fromTo('#bubble', {autoAlpha: 0, y: 0,  x:'+=50', rotation: 5, scale: 0.9}, {autoAlpha: 1, rotation: 0, scale: 1, x:0, ease: 'elastic', duration: 1})
+}
+
+function playSound(name)
+{
+	let options = sounds[name];
+	if(options)
+	{
+		let sound = options[Math.floor(Math.random() * options.length)];
+		sound.currentTime = 0;
+		sound.play();
+	}
 }
 
 function startGame()
@@ -253,13 +275,17 @@ function fire(coords)
 	if(count === 0) next();
 	count++;
 	let item;
-	if(count === 10) item = createTree();
+	if(count === 50) item = createSnowman();
+	else if(count === 10) item = createTree();
 	else item = addBall();
 
 	if(count === 100)
 	{
 		setTimeout(() => endMessage(), 1000);
 	}
+
+	playSound('fire');
+	// if(Math.random() > 0.8) playSound('bells');
 
 	let range = stage.height * 0.4;
 	let x = -60;
@@ -623,7 +649,7 @@ function createSofa()
 
 	function createTable()
 	{
-		let body = physics.createBody(6, {x: 0, y: -13, z: 2}, {y: -Math.PI * 1.013, x: Math.PI * 0.01}, PHYSICS_MATERIAL.lowBounce);
+		let body = physics.createBody(3, {x: 0, y: -13, z: 2}, {y: -Math.PI * 1.013, x: Math.PI * 0.01}, PHYSICS_MATERIAL.lowBounce);
 
 		let shapes = [
 			{
@@ -882,6 +908,70 @@ function createSofa()
 
 		var physicsItem = { 
 			mesh: treeGroup,
+			physics: body,
+		}
+		
+		// body.velocity.set(-40, 30, -40)
+		// const angularRandomness = 5;
+		// body.angularVelocity.set(
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+		// body.angularDamping = 0.8;
+		
+		physicsItems.push(physicsItem);
+
+		return physicsItem;
+	}
+
+	function createSnowman()
+	{
+		// let body = physics.createBody(10, {x: 30, y: -10, z: 30}, {y: -Math.PI * 0.001, x: Math.PI * 0.001}, PHYSICS_MATERIAL.lowBounce);
+		let body = physics.createBody(10, {x: 30, y: -10, z: 30}, {y: 0, x: Math.PI * .5}, PHYSICS_MATERIAL.normalBounce);
+		physics.setAngle(body, -Math.PI * 0.5, 'x');
+		let shapes = [
+			{
+				x: 0,
+				y: 2.5,
+				z: 0,
+				radius: 3
+			},
+			{
+				x: 0,
+				y: 5,
+				z: 0,
+				radius: 2.5
+			},
+			{
+				x: 0,
+				y: 9.5,
+				z: 0,
+				radius: 1.7
+			}
+		];
+
+		stage.models.snowman.position.y = 0;
+
+		let snowmanGroup = new Group();
+		snowmanGroup.add(stage.models.snowman);
+		stage.scene.add(snowmanGroup);
+
+		shapes.forEach(sphere => {
+			let shape = physics.createSphereShape(sphere.radius);
+			
+			if(showGuides)
+			{
+				let b = stage.createSphere(sphere.radius, 0xff0000);
+				b.position.set(sphere.x, sphere.y, sphere.z);
+				b.rotation.set(0,0,0);
+				snowmanGroup.add(b);
+			}
+
+			body.addShape(shape, new CANNON.Vec3(sphere.x, sphere.y, sphere.z), new CANNON.Quaternion(0, 0, 0));
+		})
+
+		var physicsItem = { 
+			mesh: snowmanGroup,
 			physics: body,
 		}
 		
