@@ -37,6 +37,7 @@ let showGuides = false;
 let count = 0;
 let cannonFlash;
 let cannonRecoil;
+let stars = [];
 
 // class ChristmasCannon
 // {
@@ -275,8 +276,12 @@ function fire(coords)
 	if(count === 0) next();
 	count++;
 	let item;
+
+	let randomItems = [addBall, createStar];
+
 	if(count === 50) item = createSnowman();
 	else if(count === 10) item = createTree();
+	else if(stars.length && Math.random() > 0.8) item = createStar(); //randomItems[Math.floor(Math.random() * randomItems.length)]();
 	else item = addBall();
 
 	if(count === 100)
@@ -343,8 +348,12 @@ function onReady()
 	cannonRecoil.to(stage.models.cannon.position, {x: '+=3', z: '+=3', duration: 0.1, ease: 'Power2.out'}).to(stage.models.cannon.position, {x: '-=3', z: '-=3', duration: 0.4})
 	// cannonFlash.stop();
 
-
-	
+	for (let i = 0; i < 20; i++) {
+		let star = stage.models.star.clone();
+		stars.push(star);
+		stage.scene.add(star);
+		
+	}	
 
 	animate();
 
@@ -972,6 +981,64 @@ function createSofa()
 
 		var physicsItem = { 
 			mesh: snowmanGroup,
+			physics: body,
+		}
+		
+		// body.velocity.set(-40, 30, -40)
+		// const angularRandomness = 5;
+		// body.angularVelocity.set(
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)),
+		// 	((Math.random() * angularRandomness) - (angularRandomness/2)))
+		// body.angularDamping = 0.8;
+		
+		physicsItems.push(physicsItem);
+
+		return physicsItem;
+	}
+
+	function createStar()
+	{
+
+		
+		// let body = physics.createBody(10, {x: 30, y: -10, z: 30}, {y: -Math.PI * 0.001, x: Math.PI * 0.001}, PHYSICS_MATERIAL.lowBounce);
+		let body = physics.createBody(1, {x: 30, y: -10, z: 30}, {y: 0, x: Math.PI * .5}, PHYSICS_MATERIAL.normalBounce);
+		// physics.setAngle(body, -Math.PI * 0.5, 'x');
+		let shapes = [
+			{
+				x: 0,
+				y: 0,
+				z: 0,
+				topRadius: 1,
+				bottomRadius: 1,
+				height: 0.5,
+				segments: 5
+			}
+		];
+
+		let star = stars.shift();
+		star.position.y = 0;
+
+		
+		
+
+		shapes.forEach(cylinder => {
+			let shape = physics.createCylinderShape(cylinder.topRadius, cylinder.bottomRadius, cylinder.height, cylinder.segments);
+			
+			if(showGuides)
+			{
+				let b = stage.createCylinder(cylinder.topRadius, cylinder.bottomRadius, cylinder.height, cylinder.segments, 0xff0000);
+				b.position.set(cylinder.x, cylinder.y, cylinder.z);
+				b.rotation.set(0,0,0);
+				star.add(b);
+			}
+
+			body.addShape(shape, new CANNON.Vec3(cylinder.x, cylinder.y, cylinder.z), new CANNON.Quaternion(0, 0, cylinder.rotation));
+		})
+
+
+		var physicsItem = { 
+			mesh: star,
 			physics: body,
 		}
 		

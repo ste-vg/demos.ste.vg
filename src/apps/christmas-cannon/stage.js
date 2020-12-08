@@ -449,8 +449,8 @@ class Stage
 		snowmanGroup.position.y = 1000;
 		this.scene.add( snowmanGroup );
 		
-		var tableLoader = new GLTFLoader(manager);
-		tableLoader.load("/models/snowman.gltf", object => {
+		var snowmanLoader = new GLTFLoader(manager);
+		snowmanLoader.load("/models/snowman.gltf", object => {
 
 			//object.scene.position.set(30, -30, 30);
 			object.scene.scale.set(2.5, 2.5, 2.5);
@@ -470,6 +470,37 @@ class Stage
 			} );
 
 			this.models.snowman = snowmanGroup;
+		});
+
+		///=================
+		//    STAR
+		///=================
+
+		let starGroup = new Group();
+		starGroup.position.y = 1000;
+		this.scene.add( starGroup );
+		
+		var starLoader = new GLTFLoader(manager);
+		starLoader.load("/models/star.gltf", object => {
+
+			object.scene.position.set(-1, 0, 0);
+			object.scene.scale.set(0.01, 0.01, 0.01);
+			object.scene.rotation.y = Math.PI * .5;
+		  	starGroup.add( object.scene );
+			
+			object.scene.traverse( function( child ) { 
+
+				if ( child.isMesh ) {
+					child.castShadow = true;
+				}
+				if(child.isLight)
+				{
+					child.intensity = 0;
+				}
+
+			} );
+
+			this.models.star = starGroup;
 		});
 
 
