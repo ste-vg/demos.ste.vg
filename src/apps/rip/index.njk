@@ -1,0 +1,24 @@
+---
+title: Rip
+layout: layouts/base.njk
+permalink: '/rip/'
+tags: demos
+---
+
+{% set css %}
+    {% include "./index.scss" %}
+{% endset %}
+
+<style>
+{{ css | scss | cssmin | safe }}
+</style>
+
+<canvas class="webgl"></canvas>
+
+{% set js %}
+    {% include "compiled/rip.js" %}
+{% endset %}
+
+<script>
+{{ js | safe }}
+</script>
