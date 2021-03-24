@@ -110,7 +110,7 @@ const tearWidth = 0.1;
         shadeAmount: 0.6
     },
     right: {
-        uvOffset: 0.5 - (tearWidth / width),
+        uvOffset: ((width - tearWidth) / width) * 0.5,
         ripSide: 1,
         tearXAngle: 0.5,
         tearZAngle: -0.1,
@@ -120,6 +120,8 @@ const tearWidth = 0.1;
         shadeAmount: 0.4
     }
 }
+
+console.log('offset', sheetSettings.right.uvOffset)
 
 const sides = [
     {
@@ -133,14 +135,14 @@ const sides = [
 ]
 
 // const ripShape = new Float32Array(sheetSettings.heightSegments)
-let ripShape = [];
+// let ripShape = [];
 
-for(let i = 0; i < sheetSettings.heightSegments; i++)
-{
-    ripShape.push(Math.random() * 2 - 1)
-}
+// for(let i = 0; i < sheetSettings.heightSegments; i++)
+// {
+//     ripShape.push(Math.random() * 2 - 1)
+// }
 
-console.log(ripShape)
+// console.log(ripShape)
 
 const getRipMaterial = (side, seed) => {
     return new THREE.ShaderMaterial({ 
@@ -153,10 +155,10 @@ const getRipMaterial = (side, seed) => {
         },
         uniforms: {
            uMap :           { value: textureLight },
-           uRipShape :      { value: ripShape },
+        //    uRipShape :      { value: ripShape },
            uRipSide :       { value: sheetSettings[side].ripSide},
            uRipSeed :       { value: seed},
-           uTearWidth :      { value: seed},
+           uTearWidth :     { value: sheetSettings.tearWidth},
            uTearAmount:     { value: sheetSettings.tearAmount },
            uUvOffset:       { value: sheetSettings[side].uvOffset },
            uTearXAngle:     { value: sheetSettings[side].tearXAngle },
@@ -170,7 +172,7 @@ const getRipMaterial = (side, seed) => {
        fragmentShader: ripFragmentShader
     })
 }
-const sheetPlane = new THREE.PlaneBufferGeometry(sheetSettings.width / 2 + sheetSettings.tearWidth, sheetSettings.height, sheetSettings.widthSegments, sheetSettings.heightSegments);
+const sheetPlane = new THREE.PlaneBufferGeometry(sheetSettings.width / 2 + sheetSettings.tearWidth / 2, sheetSettings.height, sheetSettings.widthSegments, sheetSettings.heightSegments);
 
 
 const updateUniforms = () => 
@@ -198,7 +200,7 @@ sides.forEach(side =>
     if(sheetSettings[side.id].tearXAngle > 0)
     {
         side.mesh.position.z += 0.0001
-        // side.mesh.position.y -= 0.01
+        // side.mesh.position.y -= 0.1
     }
     stage.add(side.mesh);
 

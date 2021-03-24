@@ -9,7 +9,9 @@ varying float vAmount;
 
 void main () {
 
-    float xScale = (float(WIDTH) - (uTearWidth * 0.5)) / float(FULL_WIDTH);
+    // float actualWidth =  float(WIDTH) - uTearWidth;
+    float xScale = ((uTearWidth * 0.5) + float(WIDTH)) / float(FULL_WIDTH);
+    // float xScale = 0.66;
     vec2 uvOffset = vec2(vUv.x * xScale + uUvOffset, vUv.y);
     vec4 textureColor = texture2D(uMap, uvOffset);
     

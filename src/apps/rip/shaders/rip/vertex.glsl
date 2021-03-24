@@ -1,6 +1,7 @@
  #pragma glslify: noise = require('glsl-noise/simplex/2d')
 
 uniform float uTearAmount;
+uniform float uTearWidth;
 uniform float uTearXAngle;
 uniform float uTearZAngle;
 uniform float uTearXOffset;
@@ -45,7 +46,7 @@ void main(){
 
 
     float halfHeight = float(HEIGHT) * 0.5;
-    float halfWidth = float(WIDTH) * 0.5;
+    float halfWidth = (float(WIDTH) - uTearWidth * 0.5) * 0.5;
     vec4 vertex = vec4(position.x + (halfWidth * uXDirection), position.y + halfHeight, position.z, 1.0);
     
     vertex = vertex * rotationX(rotation.x * yAmount )  * rotationZ(rotation.z * yAmount );
