@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import * as dat from 'dat.gui'
 import Stats from 'stats.js'
 import { Stage } from "./stage";
+import { Photo } from "./photo";
 import { Loader } from "./loader";
 import { gsap } from "gsap"
 
@@ -35,6 +36,8 @@ const loadingManager = new THREE.LoadingManager(
     {
         const tl = gsap.timeline();
         tl.to(loaderScreen, {progress: 1, alpha: 0, duration: .5, ease: 'power4.inOut'}, 0)
+
+        init();
     },
 
     // Progress
@@ -64,14 +67,16 @@ let pointLight = new THREE.PointLight({color: 'white', intensity: 20})
 pointLight.position.z = -1;
 stage.add(pointLight)
 
-import ripVertexShader from './shaders/rip/vertex.glsl'
-import ripFragmentShader from './shaders/rip/fragment.glsl'
 
 /**
  * Materials
  */
 
- const textureLight = textureLoader.load('/images/photos/photo-2.jpg')
+ const images = [
+     textureLoader.load('/images/photos/photo-1.jpg'),
+     textureLoader.load('/images/photos/photo-2.jpg')
+ ]
+ let currentImage = -1;
  const textureRip = textureLoader.load('/images/rip.jpg')
  const textureBorder = textureLoader.load('/images/border.png')
 
@@ -80,151 +85,89 @@ import ripFragmentShader from './shaders/rip/fragment.glsl'
  * Paper
  */
 
-const width = 3;
-const tearWidth = 0.3;
 
- const sheetSettings = {
-    widthSegments: 30,
-    heightSegments: 50,
-    tearOffset: Math.random(),
-    width: width,
-    height: 2,
-    tearAmount: 0,
-    tearWidth: tearWidth,
-    ripWhiteThreshold: 0.6,
-    left: {
-        uvOffset: 0,
-        ripSide: 0,
-        tearXAngle: -0.01,
-        tearYAngle: -0.1,
-        tearZAngle: 0.05,
-        tearXOffset: 0,
-        direction: -1,
-        shadeColor: new THREE.Color('white'),
-        shadeAmount: 0.2
-    },
-    right: {
-        uvOffset: ((width - tearWidth) / width) * 0.5,
-        ripSide: 1,
-        tearXAngle: 0.2,
-        tearYAngle: 0.1,
-        tearZAngle: -0.1,
-        tearXOffset: 0,
-        direction: 1,
-        shadeColor: new THREE.Color('black'),
-        shadeAmount: 0.4
-    }
-}
-
-const sides = [
-    {
-        id: 'left',
-        mesh: null
-    },
-    {
-        id: 'right',
-        mesh: null
-    } 
+const photos = [];
+const mouseStart = new THREE.Vector2()
+let mouseDown = false;
+const extraImages = [
+    '/images/photos/photo-3.jpg'
 ]
+const postInitTextureLoader = new THREE.TextureLoader()    
 
-// const ripShape = new Float32Array(sheetSettings.heightSegments)
-// let ripShape = [];
-
-// for(let i = 0; i < sheetSettings.heightSegments; i++)
-// {
-//     ripShape.push(Math.random() * 2 - 1)
-// }
-
-// console.log(ripShape)
-
-const getRipMaterial = (side, seed) => {
-    const material =  new THREE.ShaderMaterial({ 
-        defines: {
-            HEIGHT: sheetSettings.height,
-            WIDTH: sheetSettings.width / 2,
-            FULL_WIDTH: sheetSettings.width,
-            HEIGHT_SEGMENTS: sheetSettings.heightSegments,
-            WIDTH_SEGMENTS: sheetSettings.widthSegments,
-        },
-        uniforms: {
-           uMap :           { value: textureLight },
-           uRip :           { value: textureRip },
-           uBorder :           { value: textureBorder },
-        //    uRipShape :      { value: ripShape },
-           uRipSide :       { value: sheetSettings[side].ripSide},
-           uRipSeed :       { value: seed},
-           uTearWidth :     { value: sheetSettings.tearWidth},
-           uWhiteThreshold: { value: sheetSettings.ripWhiteThreshold},
-           uTearAmount:     { value: sheetSettings.tearAmount },
-           uTearOffset:     { value: sheetSettings.tearOffset },
-           uUvOffset:       { value: sheetSettings[side].uvOffset },
-           uTearXAngle:     { value: sheetSettings[side].tearXAngle },
-           uTearYAngle:     { value: sheetSettings[side].tearYAngle },
-           uTearZAngle:     { value: sheetSettings[side].tearZAngle },
-           uTearXOffset:    { value: sheetSettings[side].tearXOffset },
-           uXDirection:     { value: sheetSettings[side].direction },
-           uShadeColor:     { value: sheetSettings[side].shadeColor },
-           uShadeAmount:    { value: sheetSettings[side].shadeAmount },
-       },
-    //    wireframe: true,
-       transparent: true,
-       
-       vertexShader: ripVertexShader,
-       fragmentShader: ripFragmentShader
-    })
-
-    // material.transparent = true
-
-    return material;
-}
-const sheetPlane = new THREE.PlaneBufferGeometry(sheetSettings.width / 2 + sheetSettings.tearWidth / 2, sheetSettings.height, sheetSettings.widthSegments, sheetSettings.heightSegments);
-
-
-const updateUniforms = () => 
+const getMousePos = (x, y) =>
 {
-    if(sheetSettings.tearAmount === 0) sheetSettings.tearOffset = Math.random();
-    sides.forEach(side => 
-    {
-        const uniforms = side.mesh.material.uniforms
-        uniforms.uTearAmount.value = sheetSettings.tearAmount
-        uniforms.uTearOffset.value = sheetSettings.tearOffset
-        uniforms.uUvOffset.value = sheetSettings[side.id].uvOffset;
-        uniforms.uTearXAngle.value = sheetSettings[side.id].tearXAngle;
-        uniforms.uTearYAngle.value = sheetSettings[side.id].tearYAngle;
-        uniforms.uTearZAngle.value = sheetSettings[side.id].tearZAngle;
-        uniforms.uTearXOffset.value = sheetSettings[side.id].tearXOffset;
-        uniforms.uXDirection.value = sheetSettings[side.id].direction;
-        uniforms.uShadeColor.value = sheetSettings[side.id].shadeColor;
-        uniforms.uShadeAmount.value = sheetSettings[side.id].shadeAmount;
-        uniforms.uWhiteThreshold.value = sheetSettings.ripWhiteThreshold;
-    })
-}
-
-gui.add(sheetSettings, 'tearAmount', 0, 2, 0.001).onChange(updateUniforms)
-gui.add(sheetSettings, 'ripWhiteThreshold', 0, 1, 0.001).onChange(updateUniforms)
-
-const ripSeed = Math.random();
-sides.forEach(side => 
-{
-    side.mesh = new THREE.Mesh( sheetPlane, getRipMaterial(side.id, ripSeed))
-   
-    if(sheetSettings[side.id].tearXAngle > 0)
-    {
-        side.mesh.position.z += 0.0001
-        // side.mesh.position.y += 0.1
+    return {
+        x: (x / stage.sizes.width) * 2 - 1,
+        y: - (y / stage.sizes.height) * 2 + 1
     }
-    stage.add(side.mesh);
+}
 
-    const sideGui = gui.addFolder(side.id);
-    sideGui.add(sheetSettings[side.id], 'tearXAngle', -Math.PI, Math.PI, 0.001).onChange(updateUniforms)
-    sideGui.add(sheetSettings[side.id], 'tearYAngle',  -Math.PI, Math.PI, 0.001).onChange(updateUniforms)
-    sideGui.add(sheetSettings[side.id], 'tearZAngle', -1, 1, 0.001).onChange(updateUniforms)
-    sideGui.add(sheetSettings[side.id], 'tearXOffset', -1, 1, 0.001).onChange(updateUniforms)
-    sideGui.add(sheetSettings[side.id], 'direction', -1, 1, 0.001).onChange(updateUniforms)
-    sideGui.add(sheetSettings[side.id], 'shadeAmount', 0, 1, 0.001).onChange(updateUniforms)
-   
-})
+const down = (x, y) => 
+{
+    if(photos.length && photos[0].interactive)
+    {
+        let pos = getMousePos(x, y);
+        mouseStart.x = pos.x
+        mouseStart.y = pos.y
+        mouseDown = true;
+    }
+}
 
+const move = (x, y) =>
+{
+    if(mouseDown && photos.length && photos[0].interactive)
+    {
+        let pos = getMousePos(x, y);
+        let distanceY = mouseStart.y - pos.y
+
+        photos[0].sheetSettings.tearAmount = 2 * distanceY
+        photos[0].updateUniforms();
+    }
+}
+
+const up = () => 
+{
+    if(mouseDown && photos.length && photos[0].interactive)
+    {
+        mouseDown = false;
+        photos[0].completeRip();
+        //gsap.to(sheetSettings, {tearAmount: 0, onUpdate: updateUniforms})
+    }
+
+}
+
+const addNewPhoto = () => 
+{
+    currentImage++;
+    if(currentImage >= images.length) currentImage = 0
+
+    if(images.length - currentImage < 2 && extraImages.length) images.push(postInitTextureLoader.load(extraImages.pop()))
+
+    mouseDown = false;
+
+    let photo = new Photo(
+        {
+            photo: images[currentImage], 
+            rip: textureRip, 
+            border: textureBorder
+        },
+        () => addNewPhoto()
+    );
+    photos.unshift(photo);
+    stage.add(photo.group);
+}
+
+const init = () => 
+{
+    addNewPhoto();
+
+    window.addEventListener('mousedown', (event) => down(event.clientX, event.clientY))
+    window.addEventListener('touchstart', (event) => down(event.touches[0].clientX, event.touches[0].clientY))
+    window.addEventListener('mousemove', (event) => move(event.clientX, event.clientY))
+    window.addEventListener('touchmove', (event) => move(event.touches[0].clientX, event.touches[0].clientY))
+    window.addEventListener('mouseup', up)
+    window.addEventListener('touchend', up)
+}
 
 
 
@@ -250,9 +193,9 @@ const tick = () =>
 
 tick()
 
-let mouseDown = false;
 
-const mouseStart = new THREE.Vector2()
+
+
 
 
 
@@ -260,45 +203,5 @@ const mouseStart = new THREE.Vector2()
  * Mouse interaction
  */
 
-const getMousePos = (x, y) =>
-{
-    return {
-        x: (x / stage.sizes.width) * 2 - 1,
-        y: - (y / stage.sizes.height) * 2 + 1
-    }
-}
 
-const down = (x, y) => 
-{
-    let pos = getMousePos(x, y);
-    mouseStart.x = pos.x
-    mouseStart.y = pos.y
-    mouseDown = true;
-}
 
-const move = (x, y) =>
-{
-    if(mouseDown)
-    {
-        let pos = getMousePos(x, y);
-        let distanceY = mouseStart.y - pos.y
-        // let distanceX = mouseStart.x - pos.x
-        sheetSettings.tearAmount = 2 * distanceY
-        // sheetSettings.right.tearYAngle = -distanceX * 0.5
-
-        updateUniforms();
-    }
-}
-
-const up = () => 
-{
-    mouseDown = false;
-    gsap.to(sheetSettings, {tearAmount: 0, onUpdate: updateUniforms})
-}
-
-window.addEventListener('mousedown', (event) => down(event.clientX, event.clientY))
-window.addEventListener('touchstart', (event) => down(event.touches[0].clientX, event.touches[0].clientY))
-window.addEventListener('mousemove', (event) => move(event.clientX, event.clientY))
-window.addEventListener('touchmove', (event) => move(event.touches[0].clientX, event.touches[0].clientY))
-window.addEventListener('mouseup', up)
-window.addEventListener('touchend', up)
