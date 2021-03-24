@@ -8,10 +8,10 @@ import { gsap } from "gsap"
 
 
 // Debug
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
 const stats = new Stats()
 stats.showPanel(0)
-document.body.appendChild(stats.dom)
+// document.body.appendChild(stats.dom)
 
 
 

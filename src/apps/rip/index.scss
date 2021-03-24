@@ -6,12 +6,15 @@ html, body
   background: #17181D;
   padding: 0;
   position: relative;
+  overflow: hidden;
 }
 
 body 
 {
   
   position: relative;
+  overscroll-behavior: contain;
+  
 
   &.zoomed, &.loading
   {
