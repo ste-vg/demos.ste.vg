@@ -3,6 +3,7 @@
 uniform float uTearAmount;
 uniform float uTearWidth;
 uniform float uTearXAngle;
+uniform float uTearYAngle;
 uniform float uTearZAngle;
 uniform float uTearXOffset;
 uniform float uXDirection;
@@ -42,16 +43,19 @@ void main(){
     float yAmount = max(0.0, (uTearAmount - (1.0 - uv.y)));
     float zRotate = uTearZAngle * yAmount;
     float xRotate = uTearXAngle * yAmount;
-    vec3 rotation = vec3(xRotate, 0.0, zRotate);
+    float yRotate = uTearYAngle * yAmount;
+    vec3 rotation = vec3(xRotate* yAmount, yRotate* yAmount, zRotate* yAmount);
 
 
     float halfHeight = float(HEIGHT) * 0.5;
     float halfWidth = (float(WIDTH) - uTearWidth * 0.5) * 0.5;
-    vec4 vertex = vec4(position.x + (halfWidth * uXDirection), position.y + halfHeight, position.z, 1.0);
     
-    vertex = vertex * rotationX(rotation.x * yAmount )  * rotationZ(rotation.z * yAmount );
-    vertex.x += uTearXOffset * yAmount + ripAmount ;
+    vec4 vertex = vec4(position.x + (halfWidth * uXDirection) - halfWidth, position.y + halfHeight, position.z, 1.0);
+    
+    vertex = vertex * rotationY(rotation.y ) * rotationX(rotation.x  ) * rotationZ(rotation.z  );
+    vertex.x += uTearXOffset * yAmount + ripAmount + halfWidth ;
     vertex.y -= halfHeight;
+    
     vec4 modelPosition = modelMatrix * vertex;
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;

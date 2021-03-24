@@ -19,7 +19,7 @@ document.body.appendChild(stats.dom)
  */
 
 const canvas = document.querySelector('canvas.webgl')
-const stage = new Stage(canvas, 'pink', 'hotpink')
+const stage = new Stage(canvas, '#F1EBE4', '#D5C3AE')
 // stage.controls.target = new THREE.Vector3(0, 0, 0)
 
 /**
@@ -71,7 +71,7 @@ import ripFragmentShader from './shaders/rip/fragment.glsl'
  * Materials
  */
 
- const textureLight = textureLoader.load('/images/photos/photo-1.jpg')
+ const textureLight = textureLoader.load('/images/photos/photo-2.jpg')
  const textureRip = textureLoader.load('/images/rip.jpg')
 
 
@@ -93,19 +93,21 @@ const tearWidth = 0.3;
     left: {
         uvOffset: 0,
         ripSide: 0,
-        tearXAngle: -0.3,
-        tearZAngle: 0.1,
-        tearXOffset: -0.05,
+        tearXAngle: -0.01,
+        tearYAngle: -0.1,
+        tearZAngle: 0.05,
+        tearXOffset: 0,
         direction: -1,
         shadeColor: new THREE.Color('white'),
-        shadeAmount: 0.6
+        shadeAmount: 0.2
     },
     right: {
         uvOffset: ((width - tearWidth) / width) * 0.5,
         ripSide: 1,
-        tearXAngle: 0.5,
-        tearZAngle: -0.1,
-        tearXOffset: 0.05,
+        tearXAngle: 0.2,
+        tearYAngle: 0.1,
+        tearZAngle: -0.05,
+        tearXOffset: 0,
         direction: 1,
         shadeColor: new THREE.Color('black'),
         shadeAmount: 0.4
@@ -155,6 +157,7 @@ const getRipMaterial = (side, seed) => {
            uTearAmount:     { value: sheetSettings.tearAmount },
            uUvOffset:       { value: sheetSettings[side].uvOffset },
            uTearXAngle:     { value: sheetSettings[side].tearXAngle },
+           uTearYAngle:     { value: sheetSettings[side].tearYAngle },
            uTearZAngle:     { value: sheetSettings[side].tearZAngle },
            uTearXOffset:    { value: sheetSettings[side].tearXOffset },
            uXDirection:     { value: sheetSettings[side].direction },
@@ -183,6 +186,7 @@ const updateUniforms = () =>
         uniforms.uTearAmount.value = sheetSettings.tearAmount
         uniforms.uUvOffset.value = sheetSettings[side.id].uvOffset;
         uniforms.uTearXAngle.value = sheetSettings[side.id].tearXAngle;
+        uniforms.uTearYAngle.value = sheetSettings[side.id].tearYAngle;
         uniforms.uTearZAngle.value = sheetSettings[side.id].tearZAngle;
         uniforms.uTearXOffset.value = sheetSettings[side.id].tearXOffset;
         uniforms.uXDirection.value = sheetSettings[side.id].direction;
@@ -208,6 +212,7 @@ sides.forEach(side =>
 
     const sideGui = gui.addFolder(side.id);
     sideGui.add(sheetSettings[side.id], 'tearXAngle', -Math.PI, Math.PI, 0.001).onChange(updateUniforms)
+    sideGui.add(sheetSettings[side.id], 'tearYAngle',  -Math.PI, Math.PI, 0.001).onChange(updateUniforms)
     sideGui.add(sheetSettings[side.id], 'tearZAngle', -1, 1, 0.001).onChange(updateUniforms)
     sideGui.add(sheetSettings[side.id], 'tearXOffset', -1, 1, 0.001).onChange(updateUniforms)
     sideGui.add(sheetSettings[side.id], 'direction', -1, 1, 0.001).onChange(updateUniforms)
