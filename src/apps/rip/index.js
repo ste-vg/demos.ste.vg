@@ -87,7 +87,7 @@ const tearWidth = 0.3;
     heightSegments: 50,
     width: width,
     height: 2,
-    tearAmount: 0.5,
+    tearAmount: 0,
     tearWidth: tearWidth,
     ripWhiteThreshold: 0.6,
     left: {
@@ -203,6 +203,7 @@ const ripSeed = Math.random();
 sides.forEach(side => 
 {
     side.mesh = new THREE.Mesh( sheetPlane, getRipMaterial(side.id, ripSeed))
+   
     if(sheetSettings[side.id].tearXAngle > 0)
     {
         side.mesh.position.z += 0.0001
@@ -244,3 +245,54 @@ const tick = () =>
 }
 
 tick()
+
+let mouseDown = false;
+
+const mouseStart = new THREE.Vector2()
+
+
+
+/**
+ * Mouse interaction
+ */
+
+const getMousePos = (x, y) =>
+{
+    return {
+        x: (x / stage.sizes.width) * 2 - 1,
+        y: - (y / stage.sizes.height) * 2 + 1
+    }
+}
+
+const down = (x, y) => 
+{
+    let pos = getMousePos(x, y);
+    mouseStart.x = pos.x
+    mouseStart.y = pos.y
+    mouseDown = true;
+}
+
+const move = (x, y) =>
+{
+    if(mouseDown)
+    {
+        let pos = getMousePos(x, y);
+        let distance = mouseStart.y - pos.y
+        sheetSettings.tearAmount = 2 * distance
+
+        updateUniforms();
+    }
+}
+
+const up = () => 
+{
+    mouseDown = false;
+    gsap.to(sheetSettings, {tearAmount: 0, onUpdate: updateUniforms})
+}
+
+window.addEventListener('mousedown', (event) => down(event.clientX, event.clientY))
+window.addEventListener('touchstart', (event) => down(event.touches[0].clientX, event.touches[0].clientY))
+window.addEventListener('mousemove', (event) => move(event.clientX, event.clientY))
+window.addEventListener('touchmove', (event) => move(event.touches[0].clientX, event.touches[0].clientY))
+window.addEventListener('mouseup', up)
+window.addEventListener('touchend', up)
