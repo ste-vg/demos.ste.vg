@@ -89,13 +89,16 @@ import ripFragmentShader from './shaders/rip/fragment.glsl'
  * Paper
  */
 
+const width = 3;
+const tearWidth = 0.1;
+
  const sheetSettings = {
     widthSegments: 30,
     heightSegments: 50,
-    width: 3,
+    width: width,
     height: 2,
-    tearAmount: 1,
-    tearWidth: 0.05,
+    tearAmount: 0,
+    tearWidth: tearWidth,
     left: {
         uvOffset: 0,
         ripSide: 0,
@@ -107,7 +110,7 @@ import ripFragmentShader from './shaders/rip/fragment.glsl'
         shadeAmount: 0.6
     },
     right: {
-        uvOffset: 0.5,
+        uvOffset: 0.5 - (tearWidth / width),
         ripSide: 1,
         tearXAngle: 0.5,
         tearZAngle: -0.1,
@@ -144,6 +147,7 @@ const getRipMaterial = (side, seed) => {
         defines: {
             HEIGHT: sheetSettings.height,
             WIDTH: sheetSettings.width / 2,
+            FULL_WIDTH: sheetSettings.width,
             HEIGHT_SEGMENTS: sheetSettings.heightSegments,
             WIDTH_SEGMENTS: sheetSettings.widthSegments,
         },
@@ -152,6 +156,7 @@ const getRipMaterial = (side, seed) => {
            uRipShape :      { value: ripShape },
            uRipSide :       { value: sheetSettings[side].ripSide},
            uRipSeed :       { value: seed},
+           uTearWidth :      { value: seed},
            uTearAmount:     { value: sheetSettings.tearAmount },
            uUvOffset:       { value: sheetSettings[side].uvOffset },
            uTearXAngle:     { value: sheetSettings[side].tearXAngle },
@@ -165,7 +170,7 @@ const getRipMaterial = (side, seed) => {
        fragmentShader: ripFragmentShader
     })
 }
-const sheetPlane = new THREE.PlaneBufferGeometry(sheetSettings.width / 2, sheetSettings.height, sheetSettings.widthSegments, sheetSettings.heightSegments);
+const sheetPlane = new THREE.PlaneBufferGeometry(sheetSettings.width / 2 + sheetSettings.tearWidth, sheetSettings.height, sheetSettings.widthSegments, sheetSettings.heightSegments);
 
 
 const updateUniforms = () => 
@@ -190,6 +195,11 @@ const ripSeed = Math.random();
 sides.forEach(side => 
 {
     side.mesh = new THREE.Mesh( sheetPlane, getRipMaterial(side.id, ripSeed))
+    if(sheetSettings[side.id].tearXAngle > 0)
+    {
+        side.mesh.position.z += 0.0001
+        // side.mesh.position.y -= 0.01
+    }
     stage.add(side.mesh);
 
     const sideGui = gui.addFolder(side.id);
