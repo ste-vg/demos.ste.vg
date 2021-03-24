@@ -20,7 +20,7 @@ document.body.appendChild(stats.dom)
 
 const canvas = document.querySelector('canvas.webgl')
 const stage = new Stage(canvas, 'pink', 'hotpink')
-stage.controls.target = new THREE.Vector3(0, 0, 0)
+// stage.controls.target = new THREE.Vector3(0, 0, 0)
 
 /**
  * Loaders
@@ -72,33 +72,24 @@ import ripFragmentShader from './shaders/rip/fragment.glsl'
  */
 
  const textureLight = textureLoader.load('/images/photos/photo-1.jpg')
+ const textureRip = textureLoader.load('/images/rip.jpg')
 
- const materials = {
-    'rip': new THREE.ShaderMaterial({ 
-         uniforms: {
-            uMap : { value: textureLight },
-            uLeftSide: { value: false }
-        },
-        vertexShader: ripVertexShader,
-        fragmentShader: ripFragmentShader
-    }),
- }
- 
 
 /**
  * Paper
  */
 
 const width = 3;
-const tearWidth = 0.1;
+const tearWidth = 0.3;
 
  const sheetSettings = {
     widthSegments: 30,
     heightSegments: 50,
     width: width,
     height: 2,
-    tearAmount: 0,
+    tearAmount: 0.5,
     tearWidth: tearWidth,
+    ripWhiteThreshold: 0.6,
     left: {
         uvOffset: 0,
         ripSide: 0,
@@ -145,7 +136,7 @@ const sides = [
 // console.log(ripShape)
 
 const getRipMaterial = (side, seed) => {
-    return new THREE.ShaderMaterial({ 
+    const material =  new THREE.ShaderMaterial({ 
         defines: {
             HEIGHT: sheetSettings.height,
             WIDTH: sheetSettings.width / 2,
@@ -155,10 +146,12 @@ const getRipMaterial = (side, seed) => {
         },
         uniforms: {
            uMap :           { value: textureLight },
+           uRip :           { value: textureRip },
         //    uRipShape :      { value: ripShape },
            uRipSide :       { value: sheetSettings[side].ripSide},
            uRipSeed :       { value: seed},
            uTearWidth :     { value: sheetSettings.tearWidth},
+           uWhiteThreshold: { value: sheetSettings.ripWhiteThreshold},
            uTearAmount:     { value: sheetSettings.tearAmount },
            uUvOffset:       { value: sheetSettings[side].uvOffset },
            uTearXAngle:     { value: sheetSettings[side].tearXAngle },
@@ -168,9 +161,16 @@ const getRipMaterial = (side, seed) => {
            uShadeColor:     { value: sheetSettings[side].shadeColor },
            uShadeAmount:    { value: sheetSettings[side].shadeAmount },
        },
+    //    wireframe: true,
+       transparent: true,
+       
        vertexShader: ripVertexShader,
        fragmentShader: ripFragmentShader
     })
+
+    // material.transparent = true
+
+    return material;
 }
 const sheetPlane = new THREE.PlaneBufferGeometry(sheetSettings.width / 2 + sheetSettings.tearWidth / 2, sheetSettings.height, sheetSettings.widthSegments, sheetSettings.heightSegments);
 
@@ -188,10 +188,12 @@ const updateUniforms = () =>
         uniforms.uXDirection.value = sheetSettings[side.id].direction;
         uniforms.uShadeColor.value = sheetSettings[side.id].shadeColor;
         uniforms.uShadeAmount.value = sheetSettings[side.id].shadeAmount;
+        uniforms.uWhiteThreshold.value = sheetSettings.ripWhiteThreshold;
     })
 }
 
 gui.add(sheetSettings, 'tearAmount', 0, 2, 0.001).onChange(updateUniforms)
+gui.add(sheetSettings, 'ripWhiteThreshold', 0, 1, 0.001).onChange(updateUniforms)
 
 const ripSeed = Math.random();
 sides.forEach(side => 
@@ -200,7 +202,7 @@ sides.forEach(side =>
     if(sheetSettings[side.id].tearXAngle > 0)
     {
         side.mesh.position.z += 0.0001
-        // side.mesh.position.y -= 0.1
+        // side.mesh.position.y += 0.1
     }
     stage.add(side.mesh);
 
@@ -210,6 +212,7 @@ sides.forEach(side =>
     sideGui.add(sheetSettings[side.id], 'tearXOffset', -1, 1, 0.001).onChange(updateUniforms)
     sideGui.add(sheetSettings[side.id], 'direction', -1, 1, 0.001).onChange(updateUniforms)
     sideGui.add(sheetSettings[side.id], 'shadeAmount', 0, 1, 0.001).onChange(updateUniforms)
+   
 })
 
 

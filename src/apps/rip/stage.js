@@ -30,8 +30,8 @@ class Stage
         this.scene.add(this.camera)
 
         // Controls
-        this.controls = new OrbitControls(this.camera, this.canvas)
-        this.controls.enableDamping = true
+        // this.controls = new OrbitControls(this.camera, this.canvas)
+        // this.controls.enableDamping = true
 
         /**
          * Camera Group
@@ -90,7 +90,7 @@ class Stage
 
     render(elapsedTime)
     {
-        this.controls.update()
+        // this.controls.update()
         this.cameraGroup.position.copy(this.camera.position)
         this.cameraGroup.rotation.copy(this.camera.rotation)
         this.renderer.render(this.scene, this.camera)

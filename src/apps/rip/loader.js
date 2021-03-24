@@ -31,7 +31,8 @@ class Loader
                     gl_FragColor = vec4(uColor, uAlpha);
                 }
             `,
-            transparent: true
+            transparent: true,
+            depthTest: false
             })
         )    
     }
