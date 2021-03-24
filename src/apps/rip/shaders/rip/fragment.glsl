@@ -1,5 +1,7 @@
 uniform sampler2D uMap;
 uniform sampler2D uRip;
+uniform sampler2D uBorder;
+
 uniform vec3 uShadeColor;
 uniform float uUvOffset;
 uniform float uRipSide;
@@ -7,6 +9,7 @@ uniform float uTearXAngle;
 uniform float uShadeAmount;
 uniform float uTearWidth;
 uniform float uWhiteThreshold;
+uniform float uTearOffset;
 
 varying vec2 vUv;
 varying float vAmount;
@@ -22,6 +25,8 @@ void main () {
     float xScale = widthOverlap / float(FULL_WIDTH);
     vec2 uvOffset = vec2(vUv.x * xScale + uUvOffset, vUv.y);
     vec4 textureColor = texture2D(uMap, uvOffset);
+    vec4 borderColor = texture2D(uBorder, uvOffset);
+    if(borderColor.r > 0.0) textureColor = vec4(vec3(0.95), 1.0);
 
     float ripRange = uTearWidth / widthOverlap;
     float ripStart = uRipSide == 1.0 ? 0.0 : 1.0 - ripRange;//width / widthOverlap * (1.0 - uRipSide);
@@ -30,7 +35,7 @@ void main () {
     if(vUv.x >= ripStart && vUv.x <= (ripStart + ripRange)) 
     {
         float ripX = (vUv.x - ripStart) / ripRange;
-        float ripY = vUv.y * 0.5;
+        float ripY = vUv.y * 0.5 + (0.5 * uTearOffset);
         vec4 ripCut = texture2D(uRip, vec2(ripX, ripY));
         vec4 ripColor = texture2D(uRip, vec2(ripX * 0.9, ripY - 0.02));
 

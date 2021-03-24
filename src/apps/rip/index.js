@@ -73,6 +73,7 @@ import ripFragmentShader from './shaders/rip/fragment.glsl'
 
  const textureLight = textureLoader.load('/images/photos/photo-2.jpg')
  const textureRip = textureLoader.load('/images/rip.jpg')
+ const textureBorder = textureLoader.load('/images/border.png')
 
 
 /**
@@ -85,6 +86,7 @@ const tearWidth = 0.3;
  const sheetSettings = {
     widthSegments: 30,
     heightSegments: 50,
+    tearOffset: Math.random(),
     width: width,
     height: 2,
     tearAmount: 0,
@@ -106,15 +108,13 @@ const tearWidth = 0.3;
         ripSide: 1,
         tearXAngle: 0.2,
         tearYAngle: 0.1,
-        tearZAngle: -0.05,
+        tearZAngle: -0.1,
         tearXOffset: 0,
         direction: 1,
         shadeColor: new THREE.Color('black'),
         shadeAmount: 0.4
     }
 }
-
-console.log('offset', sheetSettings.right.uvOffset)
 
 const sides = [
     {
@@ -149,12 +149,14 @@ const getRipMaterial = (side, seed) => {
         uniforms: {
            uMap :           { value: textureLight },
            uRip :           { value: textureRip },
+           uBorder :           { value: textureBorder },
         //    uRipShape :      { value: ripShape },
            uRipSide :       { value: sheetSettings[side].ripSide},
            uRipSeed :       { value: seed},
            uTearWidth :     { value: sheetSettings.tearWidth},
            uWhiteThreshold: { value: sheetSettings.ripWhiteThreshold},
            uTearAmount:     { value: sheetSettings.tearAmount },
+           uTearOffset:     { value: sheetSettings.tearOffset },
            uUvOffset:       { value: sheetSettings[side].uvOffset },
            uTearXAngle:     { value: sheetSettings[side].tearXAngle },
            uTearYAngle:     { value: sheetSettings[side].tearYAngle },
@@ -180,10 +182,12 @@ const sheetPlane = new THREE.PlaneBufferGeometry(sheetSettings.width / 2 + sheet
 
 const updateUniforms = () => 
 {
+    if(sheetSettings.tearAmount === 0) sheetSettings.tearOffset = Math.random();
     sides.forEach(side => 
     {
         const uniforms = side.mesh.material.uniforms
         uniforms.uTearAmount.value = sheetSettings.tearAmount
+        uniforms.uTearOffset.value = sheetSettings.tearOffset
         uniforms.uUvOffset.value = sheetSettings[side.id].uvOffset;
         uniforms.uTearXAngle.value = sheetSettings[side.id].tearXAngle;
         uniforms.uTearYAngle.value = sheetSettings[side.id].tearYAngle;
@@ -277,8 +281,10 @@ const move = (x, y) =>
     if(mouseDown)
     {
         let pos = getMousePos(x, y);
-        let distance = mouseStart.y - pos.y
-        sheetSettings.tearAmount = 2 * distance
+        let distanceY = mouseStart.y - pos.y
+        // let distanceX = mouseStart.x - pos.x
+        sheetSettings.tearAmount = 2 * distanceY
+        // sheetSettings.right.tearYAngle = -distanceX * 0.5
 
         updateUniforms();
     }
