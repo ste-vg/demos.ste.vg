@@ -19,16 +19,16 @@ class Photo
 
         setTimeout(() => {
             this.interactive = true
-        }, 500)
+        }, 400)
 
         const introAnimation = gsap.timeline({
             delay: 0.3, 
             defaults: {
-                duration: 1,
+                duration: 0.8,
                 ease: 'power3.out'
             }
         })
-        introAnimation.to(this.group.rotation, {z: (Math.random() * 2 - 1) * 0.01}, 0)
+        introAnimation.to(this.group.rotation, {z: 0}, 0)
         introAnimation.to(this.group.position, {y: 0}, 0)
 
         const width = 3;
@@ -184,11 +184,12 @@ class Photo
         this.destroyCallback()
         const removeAnimation = gsap.timeline({ defaults: {duration: 1, ease: 'power2.in'}, onComplete: () => this.destroyMe() });
         removeAnimation.to(this.sheetSettings, {tearAmount: 1.5 + Math.random() * 1.5, ease: 'power2.out', onUpdate: () => this.updateUniforms()})
+        removeAnimation.to(this.group.position, {z: 1}, 0)
 
         this.sides.forEach(side => 
         {
-            removeAnimation.to(side.mesh.position, {y: -5, x: 2 * (this.sheetSettings[side.id].ripSide - 0.5) }, 0)
-            removeAnimation.to(side.mesh.rotation, {z: -2 * (this.sheetSettings[side.id].ripSide - 0.5) }, 0)
+            removeAnimation.to(side.mesh.position, {y: -3 + (Math.random() * -3), x: (2 + (Math.random() * 3)) * (this.sheetSettings[side.id].ripSide - 0.5) }, 0)
+            removeAnimation.to(side.mesh.rotation, {z: (-2 + Math.random() * -3) * (this.sheetSettings[side.id].ripSide - 0.5) }, 0)
         })
     }
 

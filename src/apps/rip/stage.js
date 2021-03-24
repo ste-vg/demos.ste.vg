@@ -69,6 +69,9 @@ class Stage
         this.sizes.width = window.innerWidth
         this.sizes.height = window.innerHeight
 
+        if(this.sizes.width < 800) this.camera.position.z = 12
+        else this.camera.position.z = 6
+
         // Update camera
         this.camera.aspect = this.sizes.width / this.sizes.height
         this.camera.updateProjectionMatrix()
