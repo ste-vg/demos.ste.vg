@@ -98,6 +98,8 @@ let mouseDown = false;
 const extraImages = [
     { file: '/images/photos/photo-1.jpg', colors: [[208,229,224], [209,209,220]] },
     { file: '/images/photos/photo-2.jpg', colors: [[191,192,184], [217,200,170]] },
+    { file: '/images/photos/photo-6.jpg', colors: [[217,226,233], [216,220,203]] },
+    { file: '/images/photos/photo-7.jpg', colors: [[206,221,226], [219,213,222]] },
     { file: '/images/photos/photo-5.jpg', colors: [[199,199,210], [218,203,195]] },
 ]
 const postInitTextureLoader = new THREE.TextureLoader()    
