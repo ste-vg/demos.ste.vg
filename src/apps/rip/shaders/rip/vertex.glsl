@@ -1,5 +1,3 @@
- #pragma glslify: noise = require('glsl-noise/simplex/2d')
-
 uniform float uTearAmount;
 uniform float uTearWidth;
 uniform float uTearXAngle;
@@ -36,9 +34,6 @@ mat4 rotationZ( in float angle ) {
 
 void main(){
     
-    // float rip = noise(vec2(position.y * 10.0, uRipSeed));
-    // float ripAmount = (0.02 * rip) * ((uRipSide - uv.x) * uXDirection);
-
     float ripAmount = 0.0;
     float yAmount = max(0.0, (uTearAmount - (1.0 - uv.y)));
     float zRotate = uTearZAngle * yAmount;

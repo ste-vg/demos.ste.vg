@@ -14,8 +14,6 @@ uniform float uTearOffset;
 varying vec2 vUv;
 varying float vAmount;
 
-// precision highp float;
-
 void main () {
 
     bool rightSide = uRipSide == 1.0;
@@ -51,7 +49,5 @@ void main () {
     } 
     if (rightSide && whiteness >= uWhiteThreshold) alpha = 0.0;
     
-    
-
     gl_FragColor = mix(vec4(textureColor.rgb, alpha), vec4(uShadeColor, alpha), vAmount * uShadeAmount);
 }

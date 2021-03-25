@@ -9,8 +9,8 @@ import { gsap } from "gsap"
 
 // Debug
 // const gui = new dat.GUI()
-const stats = new Stats()
-stats.showPanel(0)
+// const stats = new Stats()
+// stats.showPanel(0)
 // document.body.appendChild(stats.dom)
 
 let interacted = false;
@@ -217,7 +217,7 @@ const clock = new THREE.Clock()
 
 const tick = () =>
 {
-    stats.begin()
+    // stats.begin()
 
     const elapsedTime = clock.getElapsedTime()
 
@@ -225,7 +225,7 @@ const tick = () =>
 
     stage.render(elapsedTime)
     // Call tick again on the next frame
-    stats.end()
+    // stats.end()
     window.requestAnimationFrame(tick)
 }
 
