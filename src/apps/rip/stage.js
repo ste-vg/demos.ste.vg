@@ -19,7 +19,8 @@ class Stage
          * Background Gradient
          */
 
-        this.scene.add(BackgroundGradient(bottomColor, topColor))
+        this.background = BackgroundGradient(bottomColor, topColor)
+        this.scene.add(this.background)
 
         /**
          * Camera

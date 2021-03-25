@@ -50,131 +50,8 @@ canvas
     cursor: grab;
 }
 
-section
+.info
 {
-  display: flex;
-  width: 80vw;
-  height: 80vh;
-  justify-content: start;
-  align-items: center;
-  padding: 10vh 10vw;
-
-  h1
-  {
-    width: 250px;
-  }
-
-  h1, h2
-  {
-    margin: 0;
-    padding: 0;
-    color: white;
-    font-size: 3rem;
-    padding-left: var(--size-padding);
-  }
-
-  h2
-  {
-    font-size: 6rem;
-    font-weight: 400;
-  }
-}
-
-// .over section:nth-child(2n)
-// {
-//   background-color: red;
-// }
-
-
-#orbit-controls
-{
-  position: fixed;
-  z-index: 4;
-  bottom: 0;
-  right: 0;
-  width: 20vw;
-  height: 30vh;
-
-}
-
-.red-back
-{
-  // background-color: #3D0B00;
-  
-}
-
-#zoom
-{
-  cursor: pointer;
-}
-
-.dg
-{
-  z-index: 100 !important;
-}
-
-.content
-{
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  width: 100%;
-  height: 100%;
-
-  .center
-  {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  > *
-  {
-    position: absolute;
-    top: 0;
-    left: 0;
-
-    visibility: hidden;
-  }
-}
-
-.sidebar
-{
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 100;
-  width: calc(50% - (var(--size-padding) * 4));
-  height: calc(100% - (var(--size-padding) * 4));;
-  background-color: #17181D;
-  padding: calc(var(--size-padding) * 2);
-  transform: translateX(100%);
-
-  color: var(--color-light) !important;
-
-  h1
-  {
-    margin: var(--size-padding) 0;
-  }
-
-  .close-btn
-  {
-    cursor: pointer;
-    
-  }
-}
-
-.align-right
-{
-  text-align: right;
-}
-
-.loading-screen
-{
-  background-color: #17181D;
   position: fixed;
   top: 0;
   left: 0;
@@ -183,28 +60,15 @@ section
   align-items: center;
   z-index: 200;
   pointer-events: none;
-  opacity: 0;
-  width: 100vw;
-  height: 100vh;
-  transition: opacity 1s ease-out;
-  color: white;
-
-  span
+  right: 0;
+  bottom: 0;
+  // background-color: red;
+  
+  svg
   {
-    display: none;
-  }
-}
-
-.loading
-{
-  .loading-screen
-  {
-    opacity: 1;
-    transition: none;
-  }
-
-  span
-  {
-    display: block;
+    opacity: 0;
+    width: clamp(50px, 5vw, 120px);
+    height: clamp(50px, 5vw, 120px);
+    transform: translateX(150%);
   }
 }
