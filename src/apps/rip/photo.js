@@ -32,7 +32,7 @@ class Photo
         introAnimation.to(this.group.position, {y: 0}, 0)
 
         const width = 3;
-        const tearWidth = 0.3;
+        const tearWidth = 0.4;
 
         this.sheetSettings = {
             widthSegments: 30,
@@ -42,7 +42,7 @@ class Photo
             height: 2,
             tearAmount: 0,
             tearWidth: tearWidth,
-            ripWhiteThreshold: 0.6,
+            ripWhiteThreshold: 0.7,
             left: {
                 uvOffset: 0,
                 ripSide: 0,
@@ -169,7 +169,7 @@ class Photo
 
     completeRip()
     {
-        if(this.sheetSettings.tearAmount >= 1) this.remove()
+        if(this.sheetSettings.tearAmount >= 1.15) this.remove()
         else this.reset()
     }
 

@@ -73,8 +73,8 @@ stage.add(pointLight)
  */
 
  const images = [
-     textureLoader.load('/images/photos/photo-1.jpg'),
-     textureLoader.load('/images/photos/photo-2.jpg')
+     textureLoader.load('/images/photos/photo-4.jpg'),
+     textureLoader.load('/images/photos/photo-3.jpg')
  ]
  let currentImage = -1;
  const textureRip = textureLoader.load('/images/rip.jpg')
@@ -90,7 +90,9 @@ const photos = [];
 const mouseStart = new THREE.Vector2()
 let mouseDown = false;
 const extraImages = [
-    '/images/photos/photo-3.jpg'
+    '/images/photos/photo-1.jpg',
+    '/images/photos/photo-2.jpg',
+    '/images/photos/photo-5.jpg',
 ]
 const postInitTextureLoader = new THREE.TextureLoader()    
 
@@ -120,7 +122,7 @@ const move = (x, y) =>
         let pos = getMousePos(x, y);
         let distanceY = mouseStart.y - pos.y
 
-        photos[0].sheetSettings.tearAmount = 2 * distanceY
+        photos[0].sheetSettings.tearAmount = Math.max(2 * distanceY, 0)
         photos[0].updateUniforms();
     }
 }
@@ -141,7 +143,7 @@ const addNewPhoto = () =>
     currentImage++;
     if(currentImage >= images.length) currentImage = 0
 
-    if(images.length - currentImage < 2 && extraImages.length) images.push(postInitTextureLoader.load(extraImages.pop()))
+    if(images.length - currentImage < 2 && extraImages.length) images.push(postInitTextureLoader.load(extraImages.shift()))
 
     mouseDown = false;
 
